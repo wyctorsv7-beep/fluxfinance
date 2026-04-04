@@ -39,7 +39,7 @@ export async function personalizeSpendingInsights(input: PersonalizedSpendingIns
 
 const prompt = ai.definePrompt({
   name: 'personalizedSpendingInsightsPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: 'googleai/gemini-1.5-flash-latest',
   input: { schema: PersonalizedSpendingInsightsInputSchema },
   output: { schema: PersonalizedSpendingInsightsOutputSchema },
   prompt: `You are an expert financial advisor. Analyze the provided financial transactions to identify patterns, strengths, and weaknesses in the user's spending habits.

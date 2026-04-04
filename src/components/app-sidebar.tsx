@@ -41,7 +41,7 @@ export function AppSidebar() {
             <Wallet className="h-6 w-6" />
           </div>
           <div className="flex flex-col">
-            <span className="text-lg font-bold tracking-tighter text-white font-headline">Meu Bolso</span>
+            <span className="text-lg font-bold tracking-tighter text-white font-headline">Flux Finance</span>
             <span className="text-[10px] uppercase tracking-widest text-accent font-semibold">Smart Finance</span>
           </div>
         </div>

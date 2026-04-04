@@ -4,7 +4,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Meu Bolso - Gestão Financeira Inteligente',
+  title: 'Flux Finance - Gestão Financeira Inteligente',
   description: 'Controle suas finanças com facilidade e inteligência artificial.',
 };
 

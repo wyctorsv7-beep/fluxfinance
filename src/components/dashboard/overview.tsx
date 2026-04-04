@@ -36,6 +36,7 @@ const budgetData = [
 ]
 
 export function DashboardOverview() {
+  const [mounted, setMounted] = React.useState(false)
   const [transactions, setTransactions] = React.useState<any[]>([
     { id: 1, date: "2024-05-20", description: "Supermercado Mix", amount: -150.50, category: "Alimentação", type: "expense" },
     { id: 2, date: "2024-05-19", description: "Salário Mensal", amount: 5500.00, category: "Salário", type: "income" },
@@ -43,12 +44,21 @@ export function DashboardOverview() {
     { id: 4, date: "2024-05-17", description: "Restaurante Central", amount: -85.00, category: "Alimentação", type: "expense" },
   ])
 
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const balance = transactions.reduce((acc, curr) => acc + curr.amount, 0)
   const income = transactions.filter(t => t.type === 'income').reduce((acc, curr) => acc + curr.amount, 0)
   const expense = transactions.filter(t => t.type === 'expense').reduce((acc, curr) => acc + Math.abs(curr.amount), 0)
 
   const handleAddTransaction = (newTx: any) => {
     setTransactions([ { ...newTx, id: Date.now() }, ...transactions ])
+  }
+
+  const formatCurrency = (value: number) => {
+    if (!mounted) return "R$ --"
+    return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
   }
 
   return (
@@ -74,7 +84,7 @@ export function DashboardOverview() {
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Saldo Total</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-white font-headline">R$ {balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+            <div className="text-3xl font-bold text-white font-headline">{formatCurrency(balance)}</div>
             <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
               <TrendingUp className="h-3 w-3 text-accent" />
               <span className="text-accent font-medium">+12.5%</span> em relação ao mês anterior
@@ -89,7 +99,7 @@ export function DashboardOverview() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-white font-headline">R$ {income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+            <div className="text-3xl font-bold text-white font-headline">{formatCurrency(income)}</div>
             <p className="text-xs text-muted-foreground mt-1">Total acumulado este mês</p>
           </CardContent>
         </Card>
@@ -101,7 +111,7 @@ export function DashboardOverview() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-white font-headline">R$ {expense.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+            <div className="text-3xl font-bold text-white font-headline">{formatCurrency(expense)}</div>
             <p className="text-xs text-muted-foreground mt-1">Total gasto este mês</p>
           </CardContent>
         </Card>
@@ -130,7 +140,7 @@ export function DashboardOverview() {
                     fontSize={12} 
                     tickLine={false} 
                     axisLine={false} 
-                    tickFormatter={(value) => `R$${value}`}
+                    tickFormatter={(value) => mounted ? `R$${value}` : ""}
                   />
                   <Tooltip 
                     cursor={{fill: 'rgba(255, 255, 255, 0.05)'}}
@@ -164,7 +174,7 @@ export function DashboardOverview() {
                     <span className="font-medium text-white/90">{item.category}</span>
                   </div>
                   <span className="text-muted-foreground">
-                    <span className="text-white">R$ {item.spent}</span> / R$ {item.limit}
+                    <span className="text-white">{mounted ? `R$ ${item.spent}` : "R$ --"}</span> / {mounted ? `R$ ${item.limit}` : "R$ --"}
                   </span>
                 </div>
                 <Progress 

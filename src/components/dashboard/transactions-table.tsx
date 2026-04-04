@@ -16,11 +16,26 @@ import { Input } from "@/components/ui/input"
 
 export function TransactionsTable({ transactions }: { transactions: any[] }) {
   const [filter, setFilter] = React.useState("")
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
   
   const filtered = transactions.filter(t => 
     t.description.toLowerCase().includes(filter.toLowerCase()) ||
     t.category.toLowerCase().includes(filter.toLowerCase())
   )
+
+  const formatDate = (dateStr: string) => {
+    if (!mounted) return ""
+    return new Date(dateStr).toLocaleDateString('pt-BR')
+  }
+
+  const formatCurrency = (amount: number) => {
+    if (!mounted) return "--"
+    return Math.abs(amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+  }
 
   return (
     <Card className="glass-morphism border-white/5">
@@ -64,7 +79,9 @@ export function TransactionsTable({ transactions }: { transactions: any[] }) {
                     </div>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-white">{tx.description}</span>
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{new Date(tx.date).toLocaleDateString('pt-BR')}</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                        {formatDate(tx.date)}
+                      </span>
                     </div>
                   </div>
                 </TableCell>
@@ -77,7 +94,7 @@ export function TransactionsTable({ transactions }: { transactions: any[] }) {
                   <span className={`text-sm font-bold ${
                     tx.type === 'income' ? 'text-accent' : 'text-white'
                   }`}>
-                    {tx.type === 'income' ? '+' : '-'} R$ {Math.abs(tx.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    {tx.type === 'income' ? '+' : '-'} R$ {formatCurrency(tx.amount)}
                   </span>
                 </TableCell>
               </TableRow>

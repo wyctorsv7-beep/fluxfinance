@@ -58,9 +58,14 @@ export function AddTransactionModal({ onAdd }: { onAdd: (tx: any) => void }) {
       amount: "",
       category: "Outros",
       type: "expense",
-      date: new Date().toISOString().split('T')[0],
+      date: "", // Default to empty to prevent hydration mismatch
     },
   })
+
+  // Set initial date only after hydration
+  React.useEffect(() => {
+    form.setValue("date", new Date().toISOString().split('T')[0])
+  }, [form])
 
   async function handleSmartEntry() {
     if (!smartInput) return
@@ -95,6 +100,7 @@ export function AddTransactionModal({ onAdd }: { onAdd: (tx: any) => void }) {
     })
     setOpen(false)
     form.reset()
+    form.setValue("date", new Date().toISOString().split('T')[0])
     setSmartInput("")
     toast({
       title: "Transação adicionada!",
@@ -136,7 +142,7 @@ export function AddTransactionModal({ onAdd }: { onAdd: (tx: any) => void }) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Tipo</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                           <FormControl>
                             <SelectTrigger className="bg-white/5 border-white/10">
                               <SelectValue placeholder="Selecione" />
@@ -184,7 +190,7 @@ export function AddTransactionModal({ onAdd }: { onAdd: (tx: any) => void }) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Categoria</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="bg-white/5 border-white/10">
                             <SelectValue placeholder="Selecione" />
@@ -202,6 +208,19 @@ export function AddTransactionModal({ onAdd }: { onAdd: (tx: any) => void }) {
                           <SelectItem value="Outros">Outros</SelectItem>
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} className="bg-white/5 border-white/10" />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

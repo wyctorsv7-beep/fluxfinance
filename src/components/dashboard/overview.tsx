@@ -1,8 +1,11 @@
+
 "use client"
 
 import * as React from "react"
+import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase"
+import { collection, query, orderBy, limit } from "firebase/firestore"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { TrendingUp, TrendingDown, Wallet, AlertCircle } from "lucide-react"
+import { TrendingUp, TrendingDown, Wallet, AlertCircle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AddTransactionModal } from "./add-transaction-modal"
 import { TransactionsTable } from "./transactions-table"
@@ -17,62 +20,82 @@ import {
 } from "recharts"
 import { Progress } from "@/components/ui/progress"
 
-const mockChartData = [
-  { name: "Seg", income: 240, expense: 120 },
-  { name: "Ter", income: 150, expense: 300 },
-  { name: "Qua", income: 200, expense: 80 },
-  { name: "Qui", income: 320, expense: 150 },
-  { name: "Sex", income: 280, expense: 220 },
-  { name: "Sab", income: 400, expense: 100 },
-  { name: "Dom", income: 180, expense: 190 },
-]
-
-const budgetData = [
-  { category: "Alimentação", limit: 800, spent: 540, color: "hsl(var(--primary))" },
-  { category: "Transporte", limit: 300, spent: 285, color: "hsl(var(--accent))" },
-  { category: "Lazer", limit: 400, spent: 120, color: "hsl(var(--chart-3))" },
-]
-
 export function DashboardOverview() {
+  const { user } = useUser()
+  const firestore = useFirestore()
   const [mounted, setMounted] = React.useState(false)
-  const [transactions, setTransactions] = React.useState<any[]>([
-    { id: 1, date: "2024-05-20", description: "Supermercado Mix", amount: -150.50, category: "Alimentação", type: "expense" },
-    { id: 2, date: "2024-05-19", description: "Salário Mensal", amount: 5500.00, category: "Salário", type: "income" },
-    { id: 3, date: "2024-05-18", description: "Uber Viagem", amount: -45.90, category: "Transporte", type: "expense" },
-    { id: 4, date: "2024-05-17", description: "Restaurante Central", amount: -85.00, category: "Alimentação", type: "expense" },
-  ])
 
   React.useEffect(() => {
     setMounted(true)
   }, [])
 
-  const balance = transactions.reduce((acc, curr) => acc + curr.amount, 0)
-  const income = transactions.filter(t => t.type === 'income').reduce((acc, curr) => acc + curr.amount, 0)
-  const expense = transactions.filter(t => t.type === 'expense').reduce((acc, curr) => acc + Math.abs(curr.amount), 0)
+  // Memoized query for transactions
+  const transactionsQuery = useMemoFirebase(() => {
+    if (!firestore || !user?.uid) return null
+    return query(
+      collection(firestore, "users", user.uid, "transactions"),
+      orderBy("transactionDate", "desc")
+    )
+  }, [firestore, user?.uid])
 
-  const handleAddTransaction = (newTx: any) => {
-    setTransactions([ { ...newTx, id: Date.now() }, ...transactions ])
-  }
+  // Memoized query for budgets
+  const budgetsQuery = useMemoFirebase(() => {
+    if (!firestore || !user?.uid) return null
+    return collection(firestore, "users", user.uid, "budgets")
+  }, [firestore, user?.uid])
+
+  const { data: transactions, isLoading: isTxLoading } = useCollection(transactionsQuery)
+  const { data: budgets, isLoading: isBudgetsLoading } = useCollection(budgetsQuery)
+
+  const balance = React.useMemo(() => {
+    if (!transactions) return 0
+    return transactions.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0)
+  }, [transactions])
+
+  const income = React.useMemo(() => {
+    if (!transactions) return 0
+    return transactions
+      .filter(t => (Number(t.amount) || 0) > 0)
+      .reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0)
+  }, [transactions])
+
+  const expense = React.useMemo(() => {
+    if (!transactions) return 0
+    return transactions
+      .filter(t => (Number(t.amount) || 0) < 0)
+      .reduce((acc, curr) => acc + Math.abs(Number(curr.amount) || 0), 0)
+  }, [transactions])
 
   const formatCurrency = (value: number) => {
     if (!mounted) return "R$ --"
-    return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+    return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   }
+
+  if (isTxLoading && !transactions) {
+    return (
+      <div className="flex h-64 w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  // Pre-processed chart data based on real transactions (last 7 days logic could be added here)
+  const chartData = [
+    { name: "Total", income: income, expense: expense }
+  ]
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
-      {/* Header Info */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white font-headline">Visão Geral</h2>
-          <p className="text-sm text-muted-foreground">Saúde financeira em tempo real.</p>
+          <p className="text-sm text-muted-foreground">Saúde financeira baseada em seus dados reais.</p>
         </div>
         <div className="flex items-center">
-          <AddTransactionModal onAdd={handleAddTransaction} />
+          <AddTransactionModal />
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="glass-morphism border-white/5 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
@@ -84,8 +107,7 @@ export function DashboardOverview() {
           <CardContent>
             <div className="text-2xl font-bold text-white font-headline">{formatCurrency(balance)}</div>
             <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
-              <TrendingUp className="h-3 w-3 text-accent" />
-              <span className="text-accent font-medium">+12.5%</span> vs mês anterior
+              <span className="text-accent font-medium">Atualizado agora</span>
             </p>
           </CardContent>
         </Card>
@@ -98,7 +120,7 @@ export function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white font-headline">{formatCurrency(income)}</div>
-            <p className="text-[10px] text-muted-foreground mt-1">Acumulado este mês</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Total acumulado</p>
           </CardContent>
         </Card>
         <Card className="glass-morphism border-white/5 sm:col-span-2 lg:col-span-1">
@@ -110,22 +132,21 @@ export function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white font-headline">{formatCurrency(expense)}</div>
-            <p className="text-[10px] text-muted-foreground mt-1">Gasto total este mês</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Total de gastos</p>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid gap-6 grid-cols-1 xl:grid-cols-7">
-        {/* Weekly Chart */}
         <Card className="xl:col-span-4 glass-morphism border-white/5">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-white">Atividade Semanal</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">Ganhos e gastos nos últimos 7 dias.</CardDescription>
+            <CardTitle className="text-lg font-semibold text-white">Resumo Financeiro</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">Comparativo entre ganhos e gastos.</CardDescription>
           </CardHeader>
           <CardContent className="pl-0 pr-2">
             <div className="h-[250px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={mockChartData} margin={{ left: -10, right: 10 }}>
+                <BarChart data={chartData} margin={{ left: 10, right: 10 }}>
                   <XAxis 
                     dataKey="name" 
                     stroke="#888888" 
@@ -149,44 +170,53 @@ export function DashboardOverview() {
                       fontSize: '12px'
                     }}
                   />
-                  <Bar dataKey="income" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={15} />
-                  <Bar dataKey="expense" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} barSize={15} />
+                  <Bar dataKey="income" name="Receita" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={40} />
+                  <Bar dataKey="expense" name="Despesa" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} barSize={40} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
 
-        {/* Budget Control */}
         <Card className="xl:col-span-3 glass-morphism border-white/5">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-white">Metas</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">Limite por categoria.</CardDescription>
+            <CardTitle className="text-lg font-semibold text-white">Orçamentos</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">Controle de limites por categoria.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
-            {budgetData.map((item) => (
-              <div key={item.category} className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span className="font-medium text-white/90">{item.category}</span>
+            {budgets && budgets.length > 0 ? budgets.map((budget) => {
+              const spentInCategory = transactions?.filter(t => t.category === budget.categoryId && (Number(t.amount) || 0) < 0)
+                .reduce((acc, curr) => acc + Math.abs(Number(curr.amount) || 0), 0) || 0;
+              const percent = (spentInCategory / (Number(budget.amount) || 1)) * 100;
+
+              return (
+                <div key={budget.id} className="space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                      <span className="font-medium text-white/90">{budget.categoryId}</span>
+                    </div>
+                    <span className="text-muted-foreground">
+                      <span className="text-white font-semibold">{formatCurrency(spentInCategory)}</span> / {formatCurrency(Number(budget.amount))}
+                    </span>
                   </div>
-                  <span className="text-muted-foreground">
-                    <span className="text-white font-semibold">{mounted ? `R$ ${item.spent}` : "R$ --"}</span> / {mounted ? `R$ ${item.limit}` : "R$ --"}
-                  </span>
+                  <Progress 
+                    value={percent} 
+                    className="h-1.5 bg-white/5" 
+                    indicatorClassName={percent > 90 ? "bg-destructive" : "bg-primary"}
+                  />
+                  {percent > 90 && (
+                    <div className="flex items-center gap-1 text-[9px] text-destructive font-bold uppercase tracking-tight">
+                      <AlertCircle className="h-2.5 w-2.5" /> Atenção ao limite
+                    </div>
+                  )}
                 </div>
-                <Progress 
-                  value={(item.spent / item.limit) * 100} 
-                  className="h-1.5 bg-white/5" 
-                  indicatorClassName={item.spent > item.limit * 0.9 ? "bg-destructive" : "bg-primary"}
-                />
-                {item.spent > item.limit * 0.9 && (
-                  <div className="flex items-center gap-1 text-[9px] text-destructive font-bold uppercase tracking-tight">
-                    <AlertCircle className="h-2.5 w-2.5" /> Atenção ao limite
-                  </div>
-                )}
+              )
+            }) : (
+              <div className="text-center py-10">
+                <p className="text-xs text-muted-foreground">Nenhum orçamento definido.</p>
               </div>
-            ))}
+            )}
             <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 text-[10px] h-8">
               Ajustar Orçamentos
             </Button>
@@ -195,14 +225,12 @@ export function DashboardOverview() {
       </div>
 
       <div className="grid gap-6 grid-cols-1 xl:grid-cols-7">
-        {/* Transaction History */}
         <div className="xl:col-span-4 order-2 xl:order-1 overflow-x-auto">
-          <TransactionsTable transactions={transactions} />
+          <TransactionsTable transactions={transactions || []} />
         </div>
 
-        {/* AI Insights Sidebar */}
         <div className="xl:col-span-3 order-1 xl:order-2">
-          <AIInsightsPanel transactions={transactions} />
+          <AIInsightsPanel transactions={transactions || []} />
         </div>
       </div>
     </div>

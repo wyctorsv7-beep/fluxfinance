@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -23,18 +24,20 @@ export function TransactionsTable({ transactions }: { transactions: any[] }) {
   }, [])
   
   const filtered = transactions.filter(t => 
-    t.description.toLowerCase().includes(filter.toLowerCase()) ||
-    t.category.toLowerCase().includes(filter.toLowerCase())
+    t.description?.toLowerCase().includes(filter.toLowerCase()) ||
+    t.category?.toLowerCase().includes(filter.toLowerCase())
   )
 
   const formatDate = (dateStr: string) => {
-    if (!mounted) return ""
-    return new Date(dateStr).toLocaleDateString('pt-BR')
+    if (!mounted || !dateStr) return ""
+    // Handle both YYYY-MM-DD and potentially other formats
+    const date = new Date(dateStr)
+    return isNaN(date.getTime()) ? dateStr : date.toLocaleDateString('pt-BR')
   }
 
   const formatCurrency = (amount: number) => {
     if (!mounted) return "--"
-    return Math.abs(amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+    return Math.abs(amount).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 
   return (
@@ -70,9 +73,9 @@ export function TransactionsTable({ transactions }: { transactions: any[] }) {
                   <TableCell className="py-3 px-4 sm:px-0">
                     <div className="flex items-center gap-3">
                       <div className={`h-8 w-8 shrink-0 rounded-full flex items-center justify-center ${
-                        tx.type === 'income' ? 'bg-accent/10' : 'bg-primary/10'
+                        (Number(tx.amount) || 0) > 0 ? 'bg-accent/10' : 'bg-primary/10'
                       }`}>
-                        {tx.type === 'income' ? (
+                        {(Number(tx.amount) || 0) > 0 ? (
                           <ArrowUpRight className="h-4 w-4 text-accent" />
                         ) : (
                           <ArrowDownRight className="h-4 w-4 text-primary" />
@@ -81,21 +84,21 @@ export function TransactionsTable({ transactions }: { transactions: any[] }) {
                       <div className="flex flex-col min-w-0">
                         <span className="text-sm font-medium text-white truncate max-w-[120px] xs:max-w-[200px]">{tx.description}</span>
                         <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                          {formatDate(tx.date)}
+                          {formatDate(tx.transactionDate || tx.date)}
                         </span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
                     <Badge variant="outline" className="bg-white/5 border-white/10 text-[9px] text-muted-foreground font-normal px-2 py-0 h-5">
-                      {tx.category}
+                      {tx.category || "Outros"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right py-3 px-4 sm:px-0">
                     <span className={`text-sm font-bold whitespace-nowrap ${
-                      tx.type === 'income' ? 'text-accent' : 'text-white'
+                      (Number(tx.amount) || 0) > 0 ? 'text-accent' : 'text-white'
                     }`}>
-                      {tx.type === 'income' ? '+' : '-'} R$ {formatCurrency(tx.amount)}
+                      {(Number(tx.amount) || 0) > 0 ? '+' : '-'} R$ {formatCurrency(tx.amount)}
                     </span>
                   </TableCell>
                 </TableRow>

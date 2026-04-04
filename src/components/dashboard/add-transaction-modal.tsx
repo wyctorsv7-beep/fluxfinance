@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -36,6 +37,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { extractTransactionDetails } from "@/ai/flows/smart-transaction-entry-flow"
+import { useUser, useFirestore } from "@/firebase"
+import { collection, serverTimestamp, doc } from "firebase/firestore"
+import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 
 const formSchema = z.object({
   description: z.string().min(2, "Descrição curta demais"),
@@ -45,7 +49,9 @@ const formSchema = z.object({
   date: z.string(),
 })
 
-export function AddTransactionModal({ onAdd }: { onAdd: (tx: any) => void }) {
+export function AddTransactionModal() {
+  const { user } = useUser()
+  const firestore = useFirestore()
   const [open, setOpen] = React.useState(false)
   const [isAiLoading, setIsAiLoading] = React.useState(false)
   const [smartInput, setSmartInput] = React.useState("")
@@ -58,14 +64,15 @@ export function AddTransactionModal({ onAdd }: { onAdd: (tx: any) => void }) {
       amount: "",
       category: "Outros",
       type: "expense",
-      date: "", // Default to empty to prevent hydration mismatch
+      date: "",
     },
   })
 
-  // Set initial date only after hydration
   React.useEffect(() => {
-    form.setValue("date", new Date().toISOString().split('T')[0])
-  }, [form])
+    if (open) {
+      form.setValue("date", new Date().toISOString().split('T')[0])
+    }
+  }, [open, form])
 
   async function handleSmartEntry() {
     if (!smartInput) return
@@ -74,7 +81,7 @@ export function AddTransactionModal({ onAdd }: { onAdd: (tx: any) => void }) {
       const result = await extractTransactionDetails({ transactionDescription: smartInput })
       if (result) {
         form.setValue("description", result.description)
-        form.setValue("amount", result.amount.toString())
+        form.setValue("amount", Math.abs(result.amount).toString())
         form.setValue("category", result.suggestedCategory || "Outros")
         form.setValue("type", result.amount > 0 ? "income" : "expense")
         toast({
@@ -94,13 +101,26 @@ export function AddTransactionModal({ onAdd }: { onAdd: (tx: any) => void }) {
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    onAdd({
-      ...values,
-      amount: values.type === 'expense' ? -Math.abs(Number(values.amount)) : Math.abs(Number(values.amount))
+    if (!user?.uid || !firestore) return
+
+    const amountValue = values.type === 'expense' ? -Math.abs(Number(values.amount)) : Math.abs(Number(values.amount))
+    
+    const transactionsRef = collection(firestore, "users", user.uid, "transactions")
+    
+    addDocumentNonBlocking(transactionsRef, {
+      userId: user.uid,
+      description: values.description,
+      amount: amountValue,
+      categoryId: values.category,
+      category: values.category, // Storing both for flexibility
+      type: values.type,
+      transactionDate: values.date,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     })
+
     setOpen(false)
     form.reset()
-    form.setValue("date", new Date().toISOString().split('T')[0])
     setSmartInput("")
     toast({
       title: "Transação adicionada!",

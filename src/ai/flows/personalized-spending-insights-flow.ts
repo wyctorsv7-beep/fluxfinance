@@ -19,17 +19,17 @@ const TransactionSchema = z.object({
 });
 
 const PersonalizedSpendingInsightsInputSchema = z.object({
-  transactions: z.array(TransactionSchema).describe('A list of the user\u0027s financial transactions.'),
-  budgetSummary: z.string().optional().describe('An optional summary of the user\u0027s current budget limits or targets.'),
-  financialGoals: z.string().optional().describe('An optional description of the user\u0027s financial goals.'),
+  transactions: z.array(TransactionSchema).describe('A list of the user\'s financial transactions.'),
+  budgetSummary: z.string().optional().describe('An optional summary of the user\'s current budget limits or targets.'),
+  financialGoals: z.string().optional().describe('An optional description of the user\'s financial goals.'),
 });
 export type PersonalizedSpendingInsightsInput = z.infer<typeof PersonalizedSpendingInsightsInputSchema>;
 
 const PersonalizedSpendingInsightsOutputSchema = z.object({
-  overallSummary: z.string().describe('A concise summary of the user\u0027s spending habits.'),
+  overallSummary: z.string().describe('A concise summary of the user\'s spending habits.'),
   spendingBreakdown: z.record(z.string(), z.number()).describe('A breakdown of spending by category, showing total amount for each.'),
   savingSuggestions: z.array(z.string()).describe('A list of actionable suggestions for saving money.'),
-  budgetOptimizationTips: z.array(z.string()).describe('A list of tips to optimize the user\u0027s budget.'),
+  budgetOptimizationTips: z.array(z.string()).describe('A list of tips to optimize the user\'s budget.'),
 });
 export type PersonalizedSpendingInsightsOutput = z.infer<typeof PersonalizedSpendingInsightsOutputSchema>;
 

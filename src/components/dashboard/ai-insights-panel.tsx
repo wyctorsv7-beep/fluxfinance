@@ -13,23 +13,32 @@ export function AIInsightsPanel({ transactions }: { transactions: any[] }) {
   const { toast } = useToast()
 
   async function generateInsights() {
+    if (!transactions || transactions.length === 0) {
+      toast({
+        title: "Dados insuficientes",
+        description: "Adicione algumas transações primeiro para que possamos analisá-las.",
+      })
+      return
+    }
+
     setIsLoading(true)
     try {
       const result = await personalizeSpendingInsights({
         transactions: transactions.map(t => ({
-          date: t.date,
-          description: t.description,
-          amount: t.amount,
-          type: t.type,
-          category: t.category
+          date: t.transactionDate || t.date || new Date().toISOString().split('T')[0],
+          description: t.description || "Sem descrição",
+          amount: Number(t.amount) || 0,
+          type: t.type || (Number(t.amount) >= 0 ? 'income' : 'expense'),
+          category: t.category || t.categoryId || "Geral"
         }))
       })
       setInsights(result)
-    } catch (error) {
+    } catch (error: any) {
+      console.error("AI Error:", error)
       toast({
         variant: "destructive",
         title: "Erro no Advisor",
-        description: "Não conseguimos analisar seus dados agora.",
+        description: "Não conseguimos analisar seus dados agora. Tente novamente em instantes.",
       })
     } finally {
       setIsLoading(false)

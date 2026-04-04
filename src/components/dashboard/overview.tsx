@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { TrendingUp, TrendingDown, Wallet, AlertCircle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AddTransactionModal } from "./add-transaction-modal"
+import { AddBudgetModal } from "./add-budget-modal"
 import { TransactionsTable } from "./transactions-table"
 import { AIInsightsPanel } from "./ai-insights-panel"
 import {
@@ -79,7 +80,6 @@ export function DashboardOverview() {
     )
   }
 
-  // Pre-processed chart data based on real transactions (last 7 days logic could be added here)
   const chartData = [
     { name: "Total", income: income, expense: expense }
   ]
@@ -185,9 +185,10 @@ export function DashboardOverview() {
           </CardHeader>
           <CardContent className="space-y-5">
             {budgets && budgets.length > 0 ? budgets.map((budget) => {
-              const spentInCategory = transactions?.filter(t => t.category === budget.categoryId && (Number(t.amount) || 0) < 0)
+              const spentInCategory = transactions?.filter(t => (t.category === budget.categoryId || t.categoryId === budget.categoryId) && (Number(t.amount) || 0) < 0)
                 .reduce((acc, curr) => acc + Math.abs(Number(curr.amount) || 0), 0) || 0;
-              const percent = (spentInCategory / (Number(budget.amount) || 1)) * 100;
+              const budgetAmount = Number(budget.amount) || 1;
+              const percent = Math.min((spentInCategory / budgetAmount) * 100, 100);
 
               return (
                 <div key={budget.id} className="space-y-2">
@@ -197,15 +198,15 @@ export function DashboardOverview() {
                       <span className="font-medium text-white/90">{budget.categoryId}</span>
                     </div>
                     <span className="text-muted-foreground">
-                      <span className="text-white font-semibold">{formatCurrency(spentInCategory)}</span> / {formatCurrency(Number(budget.amount))}
+                      <span className="text-white font-semibold">{formatCurrency(spentInCategory)}</span> / {formatCurrency(budgetAmount)}
                     </span>
                   </div>
                   <Progress 
                     value={percent} 
                     className="h-1.5 bg-white/5" 
-                    indicatorClassName={percent > 90 ? "bg-destructive" : "bg-primary"}
+                    indicatorClassName={(spentInCategory / budgetAmount) > 0.9 ? "bg-destructive" : "bg-primary"}
                   />
-                  {percent > 90 && (
+                  {(spentInCategory / budgetAmount) > 0.9 && (
                     <div className="flex items-center gap-1 text-[9px] text-destructive font-bold uppercase tracking-tight">
                       <AlertCircle className="h-2.5 w-2.5" /> Atenção ao limite
                     </div>
@@ -217,9 +218,7 @@ export function DashboardOverview() {
                 <p className="text-xs text-muted-foreground">Nenhum orçamento definido.</p>
               </div>
             )}
-            <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 text-[10px] h-8">
-              Ajustar Orçamentos
-            </Button>
+            <AddBudgetModal />
           </CardContent>
         </Card>
       </div>

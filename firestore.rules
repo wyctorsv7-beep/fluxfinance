@@ -1,0 +1,127 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * MEU BOLSO SECURITY RULES
+     *
+     * CORE PHILOSOPHY:
+     * This ruleset implements a strict path-based ownership model. Security is derived from the 
+     * hierarchical structure of the data, ensuring that user-specific data is isolated and 
+     * protected by default.
+     *
+     * DATA STRUCTURE:
+     * - /users/{userId}: Root profile for each user.
+     * - /users/{userId}/[subcollections]: Private data (Transactions, Budgets, Custom Categories).
+     * - /system_categories: Global, read-only configuration data for all authenticated users.
+     *
+     * KEY SECURITY DECISIONS:
+     * 1. Authorization Independence: We rely primarily on the {userId} in the document path to 
+     *    authorize requests, matching it against the request.auth.uid.
+     * 2. Structural Segregation: System-wide categories are kept in a separate top-level 
+     *    collection from user-defined categories to ensure clean, performant list operations 
+     *    without needing complex logic to filter "public" vs "private" items in one collection.
+     * 3. Prototyping Flexibility: While ownership is strictly enforced, we allow flexibility 
+     *    in the data schema (field types and shapes) to facilitate rapid iteration.
+     *
+     * DENORMALIZATION FOR AUTHORIZATION:
+     * To ensure relational integrity and allow for stateless rule evaluation, the 'userId' 
+     * is required to be present within documents. This field is validated against the path 
+     * parameter during creation and is treated as immutable during updates.
+     */
+
+    // --- Helper Functions ---
+
+    /**
+     * @description Checks if the request is from a signed-in user.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user matches the provided userId.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks ownership and ensures the document exists for state-changing operations.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Rules for the User profile document. Access is restricted to the user themselves.
+     * @path /users/{userId}
+     * @allow (get) If auth.uid matches userId.
+     * @deny (list) Requests to list all users are always rejected.
+     * @principle Enforces strict document ownership and prevents user enumeration.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for system-defined categories. These are read-only for all logged-in users.
+     * @path /system_categories/{categoryId}
+     * @allow (get, list) If the user is authenticated.
+     * @deny (write) Any attempt to create, update, or delete system categories.
+     * @principle Implements public-read access for configuration data while restricting writes.
+     */
+    match /system_categories/{categoryId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Rules for custom, user-defined categories.
+     * @path /users/{userId}/categories/{categoryId}
+     * @allow (get, list) If auth.uid matches the parent path userId.
+     * @deny (create) If the document's internal userId does not match the path.
+     * @principle Path-based subcollection isolation with relational field validation.
+     */
+    match /users/{userId}/categories/{categoryId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for financial transactions recorded by the user.
+     * @path /users/{userId}/transactions/{transactionId}
+     * @allow (create) auth.uid matches userId and data.userId matches userId.
+     * @deny (update) Any attempt to change the userId of an existing transaction.
+     * @principle Enforces private data access and prevents cross-user data injection.
+     */
+    match /users/{userId}/transactions/{transactionId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for financial budgets created by the user.
+     * @path /users/{userId}/budgets/{budgetId}
+     * @allow (get, list) If auth.uid matches the path's userId.
+     * @deny (delete) If the user is not the owner or document does not exist.
+     * @principle Ensures financial targets are only accessible and modifiable by the owner.
+     */
+    match /users/{userId}/budgets/{budgetId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+    }
+  }
+}

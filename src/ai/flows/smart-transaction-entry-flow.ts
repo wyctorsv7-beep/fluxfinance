@@ -28,7 +28,7 @@ export async function extractTransactionDetails(input: SmartTransactionEntryInpu
 
 const smartTransactionEntryPrompt = ai.definePrompt({
   name: 'smartTransactionEntryPrompt',
-  model: 'googleai/gemini-1.5-flash-latest',
+  model: 'googleai/gemini-2.0-flash',
   input: {schema: SmartTransactionEntryInputSchema},
   output: {schema: SmartTransactionEntryOutputSchema},
   prompt: `You are an AI assistant designed to extract financial transaction details and suggest a category.

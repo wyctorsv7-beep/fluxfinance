@@ -11,8 +11,7 @@ import {
   Target,
   Sparkles,
   Wallet,
-  LogOut,
-  User
+  LogOut
 } from "lucide-react"
 
 import {
@@ -100,9 +99,6 @@ export function AppSidebar() {
             <div className="flex flex-col min-w-0">
               <span className="text-xs font-semibold text-white truncate">
                 {user.displayName || "Usuário"}
-              </span>
-              <span className="text-[10px] text-muted-foreground truncate">
-                {user.email || "Convidado"}
               </span>
             </div>
           </div>

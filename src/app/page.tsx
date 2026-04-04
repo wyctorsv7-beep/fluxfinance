@@ -39,7 +39,7 @@ export default function DashboardPage() {
           </div>
           <div className="ml-auto flex items-center gap-4">
             <span className="text-xs text-muted-foreground hidden sm:inline-block">
-              {user.displayName || user.email || "Convidado"}
+              {user.displayName || "Usuário"}
             </span>
             <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
               <span className="text-xs font-bold text-primary-foreground uppercase">

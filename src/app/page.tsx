@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -48,10 +49,8 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen w-full flex-col bg-background overflow-x-hidden">
       <header className="flex h-16 shrink-0 items-center border-b border-white/5 px-4 md:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-50">
-        {/* Coluna Esquerda: Espaçador */}
         <div className="flex-1" />
 
-        {/* Coluna Central: Nome do Aplicativo Centralizado */}
         <div className="flex items-center justify-center gap-2 absolute left-1/2 -translate-x-1/2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20">
             <Wallet className="h-4 w-4" />
@@ -61,7 +60,6 @@ export default function DashboardPage() {
           </span>
         </div>
 
-        {/* Coluna Direita: Perfil do Usuário com Nome visível */}
         <div className="flex items-center justify-end flex-1">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

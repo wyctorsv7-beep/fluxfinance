@@ -147,7 +147,7 @@ export function AddTransactionModal() {
                   <FormItem>
                     <FormLabel>Valor (R$)</FormLabel>
                     <FormControl>
-                      <Input placeholder="0,00" {...field} className="bg-white/5 border-white/10" />
+                      <Input placeholder="0,00" {...field} className="bg-white/5 border-white/10" disabled={isSubmitting} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -161,7 +161,7 @@ export function AddTransactionModal() {
                 <FormItem>
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Mercado, Aluguel..." {...field} className="bg-white/5 border-white/10" />
+                    <Input placeholder="Ex: Mercado, Aluguel..." {...field} className="bg-white/5 border-white/10" disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -202,7 +202,7 @@ export function AddTransactionModal() {
                 <FormItem>
                   <FormLabel>Data</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} className="bg-white/5 border-white/10" />
+                    <Input type="date" {...field} className="bg-white/5 border-white/10" disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -54,6 +54,7 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
     },
   })
 
+  // Sincroniza apenas quando o modal abre para não atrapalhar a digitação
   React.useEffect(() => {
     if (open && user) {
       form.reset({
@@ -121,7 +122,7 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[400px] glass-morphism border-white/10 text-white">
+      <DialogContent className="sm:max-w-[400px] glass-morphism border-white/10 text-white" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="text-xl font-headline font-bold">Configurações de Perfil</DialogTitle>
           <DialogDescription className="text-muted-foreground">
@@ -138,9 +139,14 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
                 <FormItem>
                   <FormLabel>Nome</FormLabel>
                   <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
                     <FormControl>
-                      <Input {...field} className="pl-10 bg-white/5 border-white/10" />
+                      <Input 
+                        {...field} 
+                        className="pl-10 bg-white/5 border-white/10 focus-visible:ring-primary" 
+                        placeholder="Seu nome"
+                        disabled={isLoading}
+                      />
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -154,9 +160,14 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
                 <FormItem>
                   <FormLabel>E-mail</FormLabel>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
                     <FormControl>
-                      <Input type="email" {...field} className="pl-10 bg-white/5 border-white/10" />
+                      <Input 
+                        type="email" 
+                        {...field} 
+                        className="pl-10 bg-white/5 border-white/10 focus-visible:ring-primary" 
+                        disabled={isLoading}
+                      />
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -168,15 +179,16 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nova Senha (deixe em branco para manter)</FormLabel>
+                  <FormLabel>Nova Senha (opcional)</FormLabel>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
                     <FormControl>
                       <Input 
                         type="password" 
                         placeholder="Mínimo 6 caracteres" 
                         {...field} 
-                        className="pl-10 bg-white/5 border-white/10" 
+                        className="pl-10 bg-white/5 border-white/10 focus-visible:ring-primary" 
+                        disabled={isLoading}
                       />
                     </FormControl>
                   </div>

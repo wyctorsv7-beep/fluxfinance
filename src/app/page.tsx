@@ -4,7 +4,6 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useUser, useAuth } from "@/firebase"
 import { DashboardOverview } from "@/components/dashboard/overview"
-import { Separator } from "@/components/ui/separator"
 import { Loader2, LogOut, User, Settings, Wallet } from "lucide-react"
 import { signOut } from "firebase/auth"
 import {
@@ -48,12 +47,8 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen w-full flex-col bg-background overflow-x-hidden">
       <header className="flex h-16 shrink-0 items-center border-b border-white/5 px-4 md:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-10">
-        {/* Coluna Esquerda: Título da Página */}
-        <div className="flex items-center gap-2 flex-1">
-          <h1 className="text-[10px] font-semibold tracking-tight text-muted-foreground font-headline uppercase truncate">
-            Dashboard
-          </h1>
-        </div>
+        {/* Coluna Esquerda: Espaçador para manter centralização */}
+        <div className="flex-1" />
 
         {/* Coluna Central: Nome do Aplicativo Centralizado */}
         <div className="flex items-center justify-center gap-2 absolute left-1/2 -translate-x-1/2">
@@ -78,7 +73,7 @@ export default function DashboardPage() {
                     </AvatarFallback>
                   </Avatar>
                 </div>
-                <div className="flex flex-col items-start hidden xs:flex">
+                <div className="flex flex-col items-start hidden xs:flex text-left">
                   <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate max-w-[120px]">
                     {user.displayName || "Usuário"}
                   </span>

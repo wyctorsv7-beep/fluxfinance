@@ -1,5 +1,6 @@
+
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/smart-transaction-entry-flow.ts';
-import '@/ai/flows/personalized-spending-insights-flow.ts';
+// IA desativada conforme solicitação do usuário.
+// Os fluxos permanecem no diretório para referência, mas não são mais importados no Dashboard.

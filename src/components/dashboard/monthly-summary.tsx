@@ -1,8 +1,9 @@
+
 "use client"
 
 import * as React from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { AlertCircle, TrendingUp, TrendingDown, PiggyBank, CreditCard, Wallet } from "lucide-react"
+import { AlertCircle, TrendingUp, TrendingDown, PiggyBank, Wallet } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 

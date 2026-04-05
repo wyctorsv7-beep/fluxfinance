@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -30,7 +31,7 @@ import { updateProfile, updateEmail, updatePassword } from "firebase/auth"
 const profileFormSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("E-mail inválido"),
-  newPassword: z.string().min(6, "A senha deve ter pelo menos 6 caracteres").optional().or(z.literal("")),
+  newPassword: z.string().transform(val => val === "" ? undefined : val).pipe(z.string().min(6, "A senha deve ter pelo menos 6 caracteres").optional()),
 })
 
 interface ProfileSettingsModalProps {
@@ -47,13 +48,13 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
   const form = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      name: user?.displayName || "",
-      email: user?.email || "",
+      name: "",
+      email: "",
       newPassword: "",
     },
   })
 
-  // Sincroniza os valores quando o usuário carregar ou o modal abrir
+  // Sincroniza os valores quando o modal abre
   React.useEffect(() => {
     if (open && user) {
       form.reset({
@@ -65,40 +66,50 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
   }, [open, user, form])
 
   async function onSubmit(values: z.infer<typeof profileFormSchema>) {
-    if (!auth.currentUser) return
+    const currentUser = auth.currentUser
+    if (!currentUser) return
 
     setIsLoading(true)
     try {
       const promises = []
 
-      // Atualiza nome se mudou
-      if (values.name !== user?.displayName) {
-        promises.push(updateProfile(auth.currentUser, { displayName: values.name }))
+      // Atualiza nome
+      if (values.name && values.name !== currentUser.displayName) {
+        promises.push(updateProfile(currentUser, { displayName: values.name }))
       }
 
-      // Atualiza email se mudou
-      if (values.email !== user?.email) {
-        promises.push(updateEmail(auth.currentUser, values.email))
+      // Atualiza email
+      if (values.email && values.email !== currentUser.email) {
+        promises.push(updateEmail(currentUser, values.email))
       }
 
-      // Atualiza senha se preenchida
+      // Atualiza senha
       if (values.newPassword) {
-        promises.push(updatePassword(auth.currentUser, values.newPassword))
+        promises.push(updatePassword(currentUser, values.newPassword))
       }
 
-      await Promise.all(promises)
-
-      toast({
-        title: "Perfil atualizado!",
-        description: "Suas alterações foram salvas com sucesso.",
-      })
+      if (promises.length > 0) {
+        await Promise.all(promises)
+        toast({
+          title: "Perfil atualizado!",
+          description: "Suas alterações foram salvas com sucesso.",
+        })
+      } else {
+        toast({
+          description: "Nenhuma alteração foi detectada.",
+        })
+      }
+      
       setOpen(false)
+      form.setValue("newPassword", "") // Limpa campo de senha
     } catch (error: any) {
       console.error("Erro ao atualizar perfil:", error)
       let description = "Ocorreu um erro ao salvar as alterações."
       
       if (error.code === 'auth/requires-recent-login') {
-        description = "Por segurança, esta ação requer que você faça login novamente recentemente."
+        description = "Por segurança, esta ação requer que você faça login novamente antes de alterar e-mail ou senha."
+      } else if (error.message) {
+        description = error.message
       }
 
       toast({
@@ -168,11 +179,17 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
               name="newPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nova Senha (deixe em branco para não alterar)</FormLabel>
+                  <FormLabel>Nova Senha (opcional)</FormLabel>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <FormControl>
-                      <Input type="password" placeholder="Mínimo 6 caracteres" {...field} className="pl-10 bg-white/5 border-white/10" />
+                      <Input 
+                        type="password" 
+                        placeholder="Mínimo 6 caracteres" 
+                        {...field} 
+                        value={field.value || ""}
+                        className="pl-10 bg-white/5 border-white/10" 
+                      />
                     </FormControl>
                   </div>
                   <FormMessage />

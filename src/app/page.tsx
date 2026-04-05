@@ -47,7 +47,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-background overflow-x-hidden">
-      <header className="flex h-16 shrink-0 items-center border-b border-white/5 px-4 md:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-10">
+      <header className="flex h-16 shrink-0 items-center border-b border-white/5 px-4 md:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-50">
         {/* Coluna Esquerda: Espaçador */}
         <div className="flex-1" />
 
@@ -78,27 +78,24 @@ export default function DashboardPage() {
                   <span className="text-xs font-bold text-white group-hover:text-primary transition-colors truncate max-w-[150px]">
                     {user.displayName || "Usuário"}
                   </span>
-                  <span className="text-[10px] text-muted-foreground truncate max-w-[150px]">
-                    {user.email}
-                  </span>
                 </div>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 glass-morphism border-white/10 text-white">
               <DropdownMenuLabel className="font-headline">Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">
+              <DropdownMenuItem className="focus:bg-white/10 cursor-pointer text-xs">
                 <User className="mr-2 h-4 w-4" />
                 <span>Perfil</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">
+              <DropdownMenuItem className="focus:bg-white/10 cursor-pointer text-xs">
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Configurações</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-white/10" />
               <DropdownMenuItem 
                 onClick={handleLogout}
-                className="focus:bg-destructive/20 text-destructive focus:text-destructive cursor-pointer"
+                className="focus:bg-destructive/20 text-destructive focus:text-destructive cursor-pointer text-xs"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Sair</span>

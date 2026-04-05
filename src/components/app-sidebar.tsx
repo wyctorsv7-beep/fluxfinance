@@ -1,16 +1,15 @@
+
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   ArrowUpRight,
   ArrowDownRight,
   PieChart,
-  Settings,
   Target,
   Wallet,
-  LogOut
+  Settings
 } from "lucide-react"
 
 import {
@@ -23,9 +22,6 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar"
-import { useAuth, useUser } from "@/firebase"
-import { signOut } from "firebase/auth"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const menuItems = [
   { title: "Dashboard", icon: LayoutDashboard, isActive: true },
@@ -36,15 +32,6 @@ const menuItems = [
 ]
 
 export function AppSidebar() {
-  const { user } = useUser()
-  const auth = useAuth()
-  const router = useRouter()
-
-  const handleLogout = async () => {
-    await signOut(auth)
-    router.push("/login")
-  }
-
   return (
     <Sidebar className="border-r border-white/5">
       <SidebarHeader className="p-4">
@@ -82,36 +69,12 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       <SidebarSeparator className="bg-white/5 mx-4" />
-      <SidebarFooter className="p-4 space-y-4">
-        {user && (
-          <div className="flex items-center gap-3 px-2 mb-2 overflow-hidden">
-            <Avatar className="h-8 w-8 border border-white/10">
-              <AvatarImage src={user.photoURL || ""} />
-              <AvatarFallback className="bg-primary/20 text-primary text-[10px]">
-                {user.displayName?.[0] || user.email?.[0] || "U"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col min-w-0">
-              <span className="text-xs font-semibold text-white truncate">
-                {user.displayName || "Usuário"}
-              </span>
-            </div>
-          </div>
-        )}
+      <SidebarFooter className="p-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton className="text-muted-foreground hover:text-foreground">
               <Settings className="h-5 w-5" />
               <span>Configurações</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              className="text-muted-foreground hover:text-destructive transition-colors"
-              onClick={handleLogout}
-            >
-              <LogOut className="h-5 w-5" />
-              <span>Sair</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

@@ -1,16 +1,28 @@
+
 "use client"
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { useUser } from "@/firebase"
+import { useUser, useAuth } from "@/firebase"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { DashboardOverview } from "@/components/dashboard/overview"
 import { Separator } from "@/components/ui/separator"
-import { Loader2 } from "lucide-react"
+import { Loader2, LogOut, User, Settings } from "lucide-react"
+import { signOut } from "firebase/auth"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser()
+  const auth = useAuth()
   const router = useRouter()
 
   React.useEffect(() => {
@@ -18,6 +30,15 @@ export default function DashboardPage() {
       router.push("/login")
     }
   }, [user, isUserLoading, router])
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth)
+      router.push("/login")
+    } catch (error) {
+      console.error("Erro ao sair:", error)
+    }
+  }
 
   if (isUserLoading || !user) {
     return (
@@ -39,15 +60,49 @@ export default function DashboardPage() {
               Dashboard
             </h1>
           </div>
-          <div className="ml-auto flex items-center gap-2 sm:gap-4">
-            <span className="text-xs text-muted-foreground hidden xs:inline-block truncate max-w-[100px] sm:max-w-none">
-              {user.displayName || "Usuário"}
-            </span>
-            <div className="h-8 w-8 shrink-0 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-              <span className="text-xs font-bold text-primary-foreground uppercase">
-                {(user.displayName?.[0] || user.email?.[0] || "U")}
-              </span>
-            </div>
+          <div className="ml-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 sm:gap-3 outline-none group hover:bg-white/5 p-1 rounded-full transition-colors pr-2">
+                  <div className="h-8 w-8 shrink-0 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden group-hover:border-primary/50 transition-colors">
+                    <Avatar className="h-full w-full">
+                      <AvatarImage src={user.photoURL || ""} />
+                      <AvatarFallback className="bg-transparent text-xs font-bold text-primary-foreground uppercase">
+                        {(user.displayName?.[0] || user.email?.[0] || "U")}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <div className="flex flex-col items-start hidden xs:flex">
+                    <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate max-w-[120px]">
+                      {user.displayName || "Usuário"}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
+                      {user.email}
+                    </span>
+                  </div>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 glass-morphism border-white/10 text-white">
+                <DropdownMenuLabel className="font-headline">Minha Conta</DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Perfil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Configurações</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem 
+                  onClick={handleLogout}
+                  className="focus:bg-destructive/20 text-destructive focus:text-destructive cursor-pointer"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
         <main className="flex-1 space-y-6 p-4 md:p-8 max-w-full overflow-x-hidden">

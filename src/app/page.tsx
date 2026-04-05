@@ -8,7 +8,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { DashboardOverview } from "@/components/dashboard/overview"
 import { Separator } from "@/components/ui/separator"
-import { Loader2, LogOut, User, Settings } from "lucide-react"
+import { Loader2, LogOut, User, Settings, Wallet } from "lucide-react"
 import { signOut } from "firebase/auth"
 import {
   DropdownMenu,
@@ -56,7 +56,16 @@ export default function DashboardPage() {
           <SidebarTrigger className="-ml-1 text-muted-foreground hover:text-accent" />
           <Separator orientation="vertical" className="mr-2 h-4" />
           <div className="flex items-center gap-2 overflow-hidden">
-            <h1 className="text-sm font-semibold tracking-tight text-foreground/90 font-headline uppercase truncate">
+            <div className="flex items-center gap-2 mr-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white">
+                <Wallet className="h-4 w-4" />
+              </div>
+              <span className="text-sm font-bold tracking-tighter text-white font-headline hidden xs:block">
+                Flux Finance
+              </span>
+            </div>
+            <Separator orientation="vertical" className="mr-2 h-4 hidden xs:block" />
+            <h1 className="text-[10px] font-semibold tracking-tight text-muted-foreground font-headline uppercase truncate">
               Dashboard
             </h1>
           </div>

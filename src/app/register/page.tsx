@@ -5,7 +5,7 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useAuth, useUser } from "@/firebase"
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
-import { Wallet, Loader2, Mail, Lock, User, Sparkles } from "lucide-react"
+import { Wallet, Loader2, Mail, Lock, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -42,7 +42,6 @@ export default function RegisterPage() {
     setIsLoading(true)
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-      // Atualiza o perfil com o nome fornecido
       await updateProfile(userCredential.user, { displayName: name })
       router.push("/")
     } catch (error: any) {
@@ -138,13 +137,6 @@ export default function RegisterPage() {
             </p>
           </CardFooter>
         </Card>
-
-        <div className="p-4 rounded-xl bg-accent/5 border border-accent/20 flex gap-3 items-start animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
-          <Sparkles className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Gestão financeira simplificada para você focar no que realmente importa.
-          </p>
-        </div>
       </div>
     </div>
   )

@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -53,15 +54,12 @@ export default function DashboardPage() {
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20">
               <Wallet className="h-4 w-4" />
             </div>
-            <span className="text-sm font-bold tracking-tighter text-white font-headline hidden xs:inline-block">
-              Flux Finance
-            </span>
           </div>
         </div>
 
-        <div className="flex-none absolute left-1/2 -translate-x-1/2 xs:hidden">
+        <div className="flex-none flex items-center justify-center">
           <span className="text-sm font-bold tracking-tighter text-white font-headline">
-            Flux
+            Flux Finance
           </span>
         </div>
 

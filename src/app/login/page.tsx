@@ -1,10 +1,11 @@
+
 "use client"
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useAuth, useUser } from "@/firebase"
 import { signInWithEmailAndPassword } from "firebase/auth"
-import { Wallet, Loader2, Mail, Lock, Sparkles } from "lucide-react"
+import { Wallet, Loader2, Mail, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -123,13 +124,6 @@ export default function LoginPage() {
             </p>
           </CardFooter>
         </Card>
-
-        <div className="p-4 rounded-xl bg-accent/5 border border-accent/20 flex gap-3 items-start animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
-          <Sparkles className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Flux Finance utiliza <span className="text-accent font-medium">Inteligência Artificial</span> para categorizar seus gastos e oferecer insights personalizados.
-          </p>
-        </div>
       </div>
     </div>
   )

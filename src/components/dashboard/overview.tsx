@@ -77,22 +77,22 @@ export function DashboardOverview() {
   }
 
   const chartData = [
-    { name: "Total", income: income, expense: expense }
+    { name: "Resumo", income: income, expense: expense }
   ]
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-700">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white font-headline">Visão Geral</h2>
-          <p className="text-sm text-muted-foreground">Saúde financeira baseada em seus dados reais.</p>
+    <div className="space-y-4 md:space-y-6 animate-in fade-in duration-700">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-0.5">
+          <h2 className="text-xl md:text-3xl font-bold tracking-tight text-white font-headline">Visão Geral</h2>
+          <p className="text-xs md:text-sm text-muted-foreground">Saúde financeira em tempo real.</p>
         </div>
         <div className="flex items-center">
           <AddTransactionModal />
         </div>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="glass-morphism border-white/5 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
             <Wallet className="h-10 w-10 text-primary" />
@@ -101,9 +101,9 @@ export function DashboardOverview() {
             <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Saldo Total</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white font-headline">{formatCurrency(balance)}</div>
+            <div className="text-xl md:text-2xl font-bold text-white font-headline">{formatCurrency(balance)}</div>
             <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
-              <span className="text-primary font-medium">Atualizado agora</span>
+              <span className="text-primary font-medium">Atualizado</span>
             </p>
           </CardContent>
         </Card>
@@ -115,7 +115,7 @@ export function DashboardOverview() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white font-headline">{formatCurrency(income)}</div>
+            <div className="text-xl md:text-2xl font-bold text-white font-headline">{formatCurrency(income)}</div>
             <p className="text-[10px] text-muted-foreground mt-1">Total acumulado</p>
           </CardContent>
         </Card>
@@ -127,23 +127,23 @@ export function DashboardOverview() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white font-headline">{formatCurrency(expense)}</div>
+            <div className="text-xl md:text-2xl font-bold text-white font-headline">{formatCurrency(expense)}</div>
             <p className="text-[10px] text-muted-foreground mt-1">Total de gastos</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
+      <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <Card className="glass-morphism border-white/5 h-full">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold text-white">Resumo Financeiro</CardTitle>
-              <CardDescription className="text-sm text-muted-foreground">Comparativo entre ganhos e gastos.</CardDescription>
+            <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
+              <CardTitle className="text-base md:text-lg font-semibold text-white">Resumo Financeiro</CardTitle>
+              <CardDescription className="text-xs md:text-sm text-muted-foreground">Ganhos vs Gastos.</CardDescription>
             </CardHeader>
-            <CardContent className="pl-0 pr-2">
-              <div className="h-[250px] w-full">
+            <CardContent className="p-2 md:p-6 pt-0 md:pt-0">
+              <div className="h-[200px] md:h-[250px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData} margin={{ left: 10, right: 10 }}>
+                  <BarChart data={chartData} margin={{ left: -20, right: 10 }}>
                     <XAxis 
                       dataKey="name" 
                       stroke="#888888" 
@@ -167,8 +167,8 @@ export function DashboardOverview() {
                         fontSize: '12px'
                       }}
                     />
-                    <Bar dataKey="income" name="Receita" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={40} />
-                    <Bar dataKey="expense" name="Despesa" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} barSize={40} />
+                    <Bar dataKey="income" name="Receita" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={32} />
+                    <Bar dataKey="expense" name="Despesa" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} barSize={32} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -184,17 +184,17 @@ export function DashboardOverview() {
         </div>
       </div>
 
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
+      <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <TransactionsTable transactions={transactions || []} />
         </div>
         <div className="lg:col-span-1">
           <Card className="glass-morphism border-white/5 h-full">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold text-white">Orçamentos</CardTitle>
-              <CardDescription className="text-sm text-muted-foreground">Controle de limites por categoria.</CardDescription>
+            <CardHeader className="p-4 md:p-6 pb-2 md:pb-2">
+              <CardTitle className="text-base md:text-lg font-semibold text-white">Orçamentos</CardTitle>
+              <CardDescription className="text-xs md:text-sm text-muted-foreground">Limites por categoria.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-5">
+            <CardContent className="p-4 md:p-6 space-y-4 md:space-y-5">
               {budgets && budgets.length > 0 ? budgets.map((budget) => {
                 const spentInCategory = transactions?.filter(t => (t.category === budget.categoryId || t.categoryId === budget.categoryId) && (Number(t.amount) || 0) < 0)
                   .reduce((acc, curr) => acc + Math.abs(Number(curr.amount) || 0), 0) || 0;
@@ -217,16 +217,11 @@ export function DashboardOverview() {
                       className="h-1.5 bg-white/5" 
                       indicatorClassName={(spentInCategory / budgetAmount) > 0.9 ? "bg-destructive" : "bg-primary"}
                     />
-                    {(spentInCategory / budgetAmount) > 0.9 && (
-                      <div className="flex items-center gap-1 text-[9px] text-destructive font-bold uppercase tracking-tight">
-                        <AlertCircle className="h-2.5 w-2.5" /> Atenção ao limite
-                      </div>
-                    )}
                   </div>
                 )
               }) : (
-                <div className="text-center py-10">
-                  <p className="text-xs text-muted-foreground">Nenhum orçamento definido.</p>
+                <div className="text-center py-6">
+                  <p className="text-[10px] text-muted-foreground">Nenhum orçamento definido.</p>
                 </div>
               )}
               <AddBudgetModal />

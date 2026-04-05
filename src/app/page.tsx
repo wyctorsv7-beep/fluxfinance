@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -49,21 +48,32 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen w-full flex-col bg-background overflow-x-hidden">
       <header className="flex h-16 shrink-0 items-center border-b border-white/5 px-4 md:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-50">
-        <div className="flex-1" />
-
-        <div className="flex items-center justify-center gap-2 absolute left-1/2 -translate-x-1/2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20">
-            <Wallet className="h-4 w-4" />
+        <div className="flex-1 flex items-center">
+          <div className="flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20">
+              <Wallet className="h-4 w-4" />
+            </div>
+            <span className="text-sm font-bold tracking-tighter text-white font-headline hidden xs:inline-block">
+              Flux Finance
+            </span>
           </div>
+        </div>
+
+        <div className="flex-none absolute left-1/2 -translate-x-1/2 xs:hidden">
           <span className="text-sm font-bold tracking-tighter text-white font-headline">
-            Flux Finance
+            Flux
           </span>
         </div>
 
-        <div className="flex items-center justify-end flex-1">
+        <div className="flex-1 flex items-center justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-3 outline-none group hover:bg-white/5 p-1.5 rounded-full transition-all pr-4">
+              <button className="flex items-center gap-2 outline-none group hover:bg-white/5 p-1 rounded-full transition-all md:pr-4">
+                <div className="flex flex-col items-end text-right hidden sm:flex">
+                  <span className="text-xs font-bold text-white group-hover:text-primary transition-colors truncate max-w-[120px]">
+                    {user.displayName || "Usuário"}
+                  </span>
+                </div>
                 <div className="h-8 w-8 shrink-0 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden group-hover:border-primary/50 transition-colors">
                   <Avatar className="h-full w-full">
                     <AvatarImage src={user.photoURL || ""} />
@@ -71,11 +81,6 @@ export default function DashboardPage() {
                       {(user.displayName?.[0] || user.email?.[0] || "U")}
                     </AvatarFallback>
                   </Avatar>
-                </div>
-                <div className="flex flex-col items-start text-left">
-                  <span className="text-xs font-bold text-white group-hover:text-primary transition-colors truncate max-w-[150px]">
-                    {user.displayName || "Usuário"}
-                  </span>
                 </div>
               </button>
             </DropdownMenuTrigger>
@@ -113,7 +118,7 @@ export default function DashboardPage() {
           </DropdownMenu>
         </div>
       </header>
-      <main className="flex-1 space-y-6 p-4 md:p-8 max-w-7xl mx-auto w-full overflow-x-hidden">
+      <main className="flex-1 space-y-4 md:space-y-6 p-3 md:p-8 max-w-7xl mx-auto w-full overflow-x-hidden">
         <DashboardOverview />
       </main>
     </div>

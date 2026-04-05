@@ -1,16 +1,13 @@
-
 "use client"
 
 import * as React from "react"
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase"
-import { collection, query, orderBy, limit } from "firebase/firestore"
+import { collection, query, orderBy } from "firebase/firestore"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { TrendingUp, TrendingDown, Wallet, AlertCircle, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { AddTransactionModal } from "./add-transaction-modal"
 import { AddBudgetModal } from "./add-budget-modal"
 import { TransactionsTable } from "./transactions-table"
-import { AIInsightsPanel } from "./ai-insights-panel"
 import {
   Bar,
   BarChart,
@@ -30,7 +27,6 @@ export function DashboardOverview() {
     setMounted(true)
   }, [])
 
-  // Memoized query for transactions
   const transactionsQuery = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null
     return query(
@@ -39,7 +35,6 @@ export function DashboardOverview() {
     )
   }, [firestore, user?.uid])
 
-  // Memoized query for budgets
   const budgetsQuery = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null
     return collection(firestore, "users", user.uid, "budgets")
@@ -107,15 +102,15 @@ export function DashboardOverview() {
           <CardContent>
             <div className="text-2xl font-bold text-white font-headline">{formatCurrency(balance)}</div>
             <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
-              <span className="text-accent font-medium">Atualizado agora</span>
+              <span className="text-primary font-medium">Atualizado agora</span>
             </p>
           </CardContent>
         </Card>
         <Card className="glass-morphism border-white/5">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Receitas</CardTitle>
-            <div className="h-7 w-7 rounded-full bg-accent/10 flex items-center justify-center">
-              <TrendingUp className="h-3.5 w-3.5 text-accent" />
+            <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center">
+              <TrendingUp className="h-3.5 w-3.5 text-primary" />
             </div>
           </CardHeader>
           <CardContent>
@@ -137,8 +132,8 @@ export function DashboardOverview() {
         </Card>
       </div>
 
-      <div className="grid gap-6 grid-cols-1 xl:grid-cols-7">
-        <Card className="xl:col-span-4 glass-morphism border-white/5">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+        <Card className="glass-morphism border-white/5">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-white">Resumo Financeiro</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">Comparativo entre ganhos e gastos.</CardDescription>
@@ -171,14 +166,14 @@ export function DashboardOverview() {
                     }}
                   />
                   <Bar dataKey="income" name="Receita" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={40} />
-                  <Bar dataKey="expense" name="Despesa" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} barSize={40} />
+                  <Bar dataKey="expense" name="Despesa" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} barSize={40} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="xl:col-span-3 glass-morphism border-white/5">
+        <Card className="glass-morphism border-white/5">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-white">Orçamentos</CardTitle>
             <CardDescription className="text-sm text-muted-foreground">Controle de limites por categoria.</CardDescription>
@@ -223,14 +218,8 @@ export function DashboardOverview() {
         </Card>
       </div>
 
-      <div className="grid gap-6 grid-cols-1 xl:grid-cols-7">
-        <div className="xl:col-span-4 order-2 xl:order-1 overflow-x-auto">
-          <TransactionsTable transactions={transactions || []} />
-        </div>
-
-        <div className="xl:col-span-3 order-1 xl:order-2">
-          <AIInsightsPanel transactions={transactions || []} />
-        </div>
+      <div className="w-full">
+        <TransactionsTable transactions={transactions || []} />
       </div>
     </div>
   )

@@ -9,7 +9,6 @@ import {
   PieChart,
   Settings,
   Target,
-  Sparkles,
   Wallet,
   LogOut
 } from "lucide-react"
@@ -34,7 +33,6 @@ const menuItems = [
   { title: "Despesas", icon: ArrowDownRight, isActive: false },
   { title: "Orçamentos", icon: Target, isActive: false },
   { title: "Relatórios", icon: PieChart, isActive: false },
-  { title: "IA Insights", icon: Sparkles, isActive: false, isAi: true },
 ]
 
 export function AppSidebar() {
@@ -56,7 +54,7 @@ export function AppSidebar() {
           </div>
           <div className="flex flex-col">
             <span className="text-lg font-bold tracking-tighter text-white font-headline">Flux Finance</span>
-            <span className="text-[10px] uppercase tracking-widest text-accent font-semibold">Smart Finance</span>
+            <span className="text-[10px] uppercase tracking-widest text-primary font-semibold">Gestão Financeira</span>
           </div>
         </div>
       </SidebarHeader>
@@ -71,15 +69,12 @@ export function AppSidebar() {
                 className={`transition-all duration-200 hover:scale-[1.02] ${
                   item.isActive 
                     ? "bg-primary/20 text-white font-medium border border-primary/20" 
-                    : "text-muted-foreground hover:bg-accent/10 hover:text-accent"
+                    : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
                 }`}
               >
                 <a href="#" className="flex items-center gap-3">
-                  <item.icon className={`h-5 w-5 ${item.isAi ? "text-accent animate-pulse" : ""}`} />
+                  <item.icon className="h-5 w-5" />
                   <span className="text-sm">{item.title}</span>
-                  {item.isAi && (
-                    <span className="ml-auto flex h-2 w-2 rounded-full bg-accent animate-ping" />
-                  )}
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>

@@ -46,6 +46,7 @@ export function AddBudgetModal() {
   const { user } = useUser()
   const firestore = useFirestore()
   const [open, setOpen] = React.useState(false)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
   const { toast } = useToast()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,9 +60,9 @@ export function AddBudgetModal() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user?.uid || !firestore) return
 
+    setIsSubmitting(true)
     const budgetsRef = collection(firestore, "users", user.uid, "budgets")
     
-    // Simplificando datas para o mês atual
     const now = new Date()
     const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
     const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
@@ -75,13 +76,12 @@ export function AddBudgetModal() {
       recurrenceType: "monthly",
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-    })
-
-    setOpen(false)
-    form.reset()
-    toast({
-      title: "Orçamento definido!",
-      description: `Limite de ${values.categoryId} atualizado com sucesso.`,
+    }).then(() => {
+      setOpen(false)
+      form.reset()
+      toast({ title: "Orçamento definido!", description: `Limite de ${values.categoryId} atualizado.` })
+    }).finally(() => {
+      setIsSubmitting(false)
     })
   }
 
@@ -96,7 +96,7 @@ export function AddBudgetModal() {
         <DialogHeader>
           <DialogTitle className="text-xl font-headline font-bold">Definir Orçamento</DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Estabeleça um limite mensal para uma categoria.
+            Estabeleça um limite mensal por categoria.
           </DialogDescription>
         </DialogHeader>
 
@@ -141,8 +141,8 @@ export function AddBudgetModal() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-              Salvar Orçamento
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isSubmitting}>
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : "Salvar Orçamento"}
             </Button>
           </form>
         </Form>

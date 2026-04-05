@@ -1,10 +1,11 @@
+
 "use client"
 
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Plus } from "lucide-react"
+import { Plus, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -37,16 +38,17 @@ import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 
 const formSchema = z.object({
   description: z.string().min(2, "Descrição curta demais"),
-  amount: z.string().refine((val) => !isNaN(Number(val)), "Valor inválido"),
+  amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) !== 0, "Valor deve ser diferente de zero"),
   category: z.string().min(1, "Selecione uma categoria"),
   type: z.enum(["income", "expense"]),
-  date: z.string(),
+  date: z.string().min(1, "Data é obrigatória"),
 })
 
 export function AddTransactionModal() {
   const { user } = useUser()
   const firestore = useFirestore()
   const [open, setOpen] = React.useState(false)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
   const { toast } = useToast()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,19 +58,17 @@ export function AddTransactionModal() {
       amount: "",
       category: "Outros",
       type: "expense",
-      date: "",
+      date: new Date().toISOString().split('T')[0],
     },
   })
 
-  React.useEffect(() => {
-    if (open) {
-      form.setValue("date", new Date().toISOString().split('T')[0])
-    }
-  }, [open, form])
-
   function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!user?.uid || !firestore) return
+    if (!user?.uid || !firestore) {
+      toast({ variant: "destructive", title: "Erro", description: "Você precisa estar logado." })
+      return
+    }
 
+    setIsSubmitting(true)
     const amountValue = values.type === 'expense' ? -Math.abs(Number(values.amount)) : Math.abs(Number(values.amount))
     
     const transactionsRef = collection(firestore, "users", user.uid, "transactions")
@@ -83,13 +83,20 @@ export function AddTransactionModal() {
       transactionDate: values.date,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-    })
-
-    setOpen(false)
-    form.reset()
-    toast({
-      title: "Transação adicionada!",
-      description: "Seu saldo foi atualizado em tempo real.",
+    }).then(() => {
+      setOpen(false)
+      form.reset({
+        description: "",
+        amount: "",
+        category: "Outros",
+        type: "expense",
+        date: new Date().toISOString().split('T')[0],
+      })
+      toast({ title: "Transação adicionada!", description: "Dados registrados com sucesso." })
+    }).catch((err) => {
+      toast({ variant: "destructive", title: "Erro", description: "Não foi possível salvar a transação." })
+    }).finally(() => {
+      setIsSubmitting(false)
     })
   }
 
@@ -105,7 +112,7 @@ export function AddTransactionModal() {
         <DialogHeader>
           <DialogTitle className="text-xl font-headline font-bold">Adicionar Transação</DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Preencha os dados da transação abaixo.
+            Insira os detalhes da movimentação.
           </DialogDescription>
         </DialogHeader>
 
@@ -154,7 +161,7 @@ export function AddTransactionModal() {
                 <FormItem>
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Supermercado, Aluguel..." {...field} className="bg-white/5 border-white/10" />
+                    <Input placeholder="Ex: Mercado, Aluguel..." {...field} className="bg-white/5 border-white/10" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -201,7 +208,9 @@ export function AddTransactionModal() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 mt-4">Salvar Transação</Button>
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 mt-4" disabled={isSubmitting}>
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : "Salvar Transação"}
+            </Button>
           </form>
         </Form>
       </DialogContent>

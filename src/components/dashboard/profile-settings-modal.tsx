@@ -31,7 +31,7 @@ import { updateProfile, updateEmail, updatePassword } from "firebase/auth"
 const profileFormSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("E-mail inválido"),
-  newPassword: z.string().transform(val => val === "" ? undefined : val).pipe(z.string().min(6, "A senha deve ter pelo menos 6 caracteres").optional()),
+  password: z.string().optional(),
 })
 
 interface ProfileSettingsModalProps {
@@ -50,73 +50,62 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
     defaultValues: {
       name: "",
       email: "",
-      newPassword: "",
+      password: "",
     },
   })
 
-  // Sincroniza os valores quando o modal abre
   React.useEffect(() => {
     if (open && user) {
       form.reset({
         name: user.displayName || "",
         email: user.email || "",
-        newPassword: "",
+        password: "",
       })
     }
   }, [open, user, form])
 
   async function onSubmit(values: z.infer<typeof profileFormSchema>) {
     const currentUser = auth.currentUser
-    if (!currentUser) return
+    if (!currentUser) {
+      toast({ variant: "destructive", title: "Erro", description: "Usuário não autenticado." })
+      return
+    }
 
     setIsLoading(true)
     try {
       const promises = []
 
-      // Atualiza nome
-      if (values.name && values.name !== currentUser.displayName) {
+      if (values.name !== currentUser.displayName) {
         promises.push(updateProfile(currentUser, { displayName: values.name }))
       }
 
-      // Atualiza email
-      if (values.email && values.email !== currentUser.email) {
+      if (values.email !== currentUser.email) {
         promises.push(updateEmail(currentUser, values.email))
       }
 
-      // Atualiza senha
-      if (values.newPassword) {
-        promises.push(updatePassword(currentUser, values.newPassword))
+      if (values.password && values.password.length >= 6) {
+        promises.push(updatePassword(currentUser, values.password))
+      } else if (values.password && values.password.length < 6) {
+        throw new Error("A nova senha deve ter pelo menos 6 caracteres.")
       }
 
       if (promises.length > 0) {
         await Promise.all(promises)
-        toast({
-          title: "Perfil atualizado!",
-          description: "Suas alterações foram salvas com sucesso.",
-        })
+        toast({ title: "Sucesso", description: "Dados atualizados com sucesso!" })
       } else {
-        toast({
-          description: "Nenhuma alteração foi detectada.",
-        })
+        toast({ description: "Nenhuma alteração detectada." })
       }
       
       setOpen(false)
-      form.setValue("newPassword", "") // Limpa campo de senha
     } catch (error: any) {
       console.error("Erro ao atualizar perfil:", error)
-      let description = "Ocorreu um erro ao salvar as alterações."
-      
+      let msg = "Erro ao salvar alterações."
       if (error.code === 'auth/requires-recent-login') {
-        description = "Por segurança, esta ação requer que você faça login novamente antes de alterar e-mail ou senha."
-      } else if (error.message) {
-        description = error.message
+        msg = "Por segurança, faça login novamente para alterar e-mail ou senha."
+      } else {
+        msg = error.message || msg
       }
-
-      toast({
-        variant: "destructive",
-        title: "Erro na atualização",
-        description,
-      })
+      toast({ variant: "destructive", title: "Erro na atualização", description: msg })
     } finally {
       setIsLoading(false)
     }
@@ -136,7 +125,7 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
         <DialogHeader>
           <DialogTitle className="text-xl font-headline font-bold">Configurações de Perfil</DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Altere seus dados de acesso e identificação.
+            Mantenha seus dados atualizados.
           </DialogDescription>
         </DialogHeader>
 
@@ -147,7 +136,7 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome Completo</FormLabel>
+                  <FormLabel>Nome</FormLabel>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <FormControl>
@@ -176,10 +165,10 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
             />
             <FormField
               control={form.control}
-              name="newPassword"
+              name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nova Senha (opcional)</FormLabel>
+                  <FormLabel>Nova Senha (deixe em branco para manter)</FormLabel>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <FormControl>
@@ -187,7 +176,6 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
                         type="password" 
                         placeholder="Mínimo 6 caracteres" 
                         {...field} 
-                        value={field.value || ""}
                         className="pl-10 bg-white/5 border-white/10" 
                       />
                     </FormControl>
@@ -196,12 +184,9 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
                 </FormItem>
               )}
             />
-            <div className="pt-2">
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading}>
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                Salvar Alterações
-              </Button>
-            </div>
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 mt-2" disabled={isLoading}>
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : "Salvar Alterações"}
+            </Button>
           </form>
         </Form>
       </DialogContent>

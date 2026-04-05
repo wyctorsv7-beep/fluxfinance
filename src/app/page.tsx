@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -47,7 +48,7 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen w-full flex-col bg-background overflow-x-hidden">
       <header className="flex h-16 shrink-0 items-center border-b border-white/5 px-4 md:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-10">
-        {/* Coluna Esquerda: Espaçador para manter centralização */}
+        {/* Coluna Esquerda: Espaçador */}
         <div className="flex-1" />
 
         {/* Coluna Central: Nome do Aplicativo Centralizado */}
@@ -60,11 +61,11 @@ export default function DashboardPage() {
           </span>
         </div>
 
-        {/* Coluna Direita: Perfil do Usuário */}
+        {/* Coluna Direita: Perfil do Usuário com Nome visível */}
         <div className="flex items-center justify-end flex-1">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 sm:gap-3 outline-none group hover:bg-white/5 p-1 rounded-full transition-colors pr-2">
+              <button className="flex items-center gap-3 outline-none group hover:bg-white/5 p-1.5 rounded-full transition-all pr-4">
                 <div className="h-8 w-8 shrink-0 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden group-hover:border-primary/50 transition-colors">
                   <Avatar className="h-full w-full">
                     <AvatarImage src={user.photoURL || ""} />
@@ -73,11 +74,11 @@ export default function DashboardPage() {
                     </AvatarFallback>
                   </Avatar>
                 </div>
-                <div className="flex flex-col items-start hidden xs:flex text-left">
-                  <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate max-w-[120px]">
+                <div className="flex flex-col items-start text-left">
+                  <span className="text-xs font-bold text-white group-hover:text-primary transition-colors truncate max-w-[150px]">
                     {user.displayName || "Usuário"}
                   </span>
-                  <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
+                  <span className="text-[10px] text-muted-foreground truncate max-w-[150px]">
                     {user.email}
                   </span>
                 </div>

@@ -52,24 +52,28 @@ export default function DashboardPage() {
     <div className="flex min-h-screen w-full overflow-x-hidden">
       <AppSidebar />
       <SidebarInset className="bg-background w-full">
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b border-white/5 px-4 sticky top-0 bg-background/80 backdrop-blur-md z-10">
-          <SidebarTrigger className="-ml-1 text-muted-foreground hover:text-accent" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <div className="flex items-center gap-2 overflow-hidden">
-            <div className="flex items-center gap-2 mr-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white">
-                <Wallet className="h-4 w-4" />
-              </div>
-              <span className="text-sm font-bold tracking-tighter text-white font-headline hidden xs:block">
-                Flux Finance
-              </span>
-            </div>
-            <Separator orientation="vertical" className="mr-2 h-4 hidden xs:block" />
-            <h1 className="text-[10px] font-semibold tracking-tight text-muted-foreground font-headline uppercase truncate">
+        <header className="flex h-16 shrink-0 items-center border-b border-white/5 px-4 sticky top-0 bg-background/80 backdrop-blur-md z-10">
+          {/* Coluna Esquerda: Trigger e Título da Página */}
+          <div className="flex items-center gap-2 flex-1">
+            <SidebarTrigger className="-ml-1 text-muted-foreground hover:text-accent" />
+            <Separator orientation="vertical" className="mr-2 h-4 hidden sm:block" />
+            <h1 className="text-[10px] font-semibold tracking-tight text-muted-foreground font-headline uppercase truncate hidden sm:block">
               Dashboard
             </h1>
           </div>
-          <div className="ml-auto">
+
+          {/* Coluna Central: Nome do Aplicativo Centralizado */}
+          <div className="flex items-center justify-center gap-2 absolute left-1/2 -translate-x-1/2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20">
+              <Wallet className="h-4 w-4" />
+            </div>
+            <span className="text-sm font-bold tracking-tighter text-white font-headline">
+              Flux Finance
+            </span>
+          </div>
+
+          {/* Coluna Direita: Perfil do Usuário */}
+          <div className="flex items-center justify-end flex-1">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 sm:gap-3 outline-none group hover:bg-white/5 p-1 rounded-full transition-colors pr-2">

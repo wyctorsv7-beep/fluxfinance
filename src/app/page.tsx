@@ -1,11 +1,8 @@
-
 "use client"
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useUser, useAuth } from "@/firebase"
-import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { DashboardOverview } from "@/components/dashboard/overview"
 import { Separator } from "@/components/ui/separator"
 import { Loader2, LogOut, User, Settings, Wallet } from "lucide-react"
@@ -49,79 +46,74 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full overflow-x-hidden">
-      <AppSidebar />
-      <SidebarInset className="bg-background w-full">
-        <header className="flex h-16 shrink-0 items-center border-b border-white/5 px-4 sticky top-0 bg-background/80 backdrop-blur-md z-10">
-          {/* Coluna Esquerda: Trigger e Título da Página */}
-          <div className="flex items-center gap-2 flex-1">
-            <SidebarTrigger className="-ml-1 text-muted-foreground hover:text-accent" />
-            <Separator orientation="vertical" className="mr-2 h-4 hidden sm:block" />
-            <h1 className="text-[10px] font-semibold tracking-tight text-muted-foreground font-headline uppercase truncate hidden sm:block">
-              Dashboard
-            </h1>
-          </div>
+    <div className="flex min-h-screen w-full flex-col bg-background overflow-x-hidden">
+      <header className="flex h-16 shrink-0 items-center border-b border-white/5 px-4 md:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-10">
+        {/* Coluna Esquerda: Título da Página */}
+        <div className="flex items-center gap-2 flex-1">
+          <h1 className="text-[10px] font-semibold tracking-tight text-muted-foreground font-headline uppercase truncate">
+            Dashboard
+          </h1>
+        </div>
 
-          {/* Coluna Central: Nome do Aplicativo Centralizado */}
-          <div className="flex items-center justify-center gap-2 absolute left-1/2 -translate-x-1/2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20">
-              <Wallet className="h-4 w-4" />
-            </div>
-            <span className="text-sm font-bold tracking-tighter text-white font-headline">
-              Flux Finance
-            </span>
+        {/* Coluna Central: Nome do Aplicativo Centralizado */}
+        <div className="flex items-center justify-center gap-2 absolute left-1/2 -translate-x-1/2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20">
+            <Wallet className="h-4 w-4" />
           </div>
+          <span className="text-sm font-bold tracking-tighter text-white font-headline">
+            Flux Finance
+          </span>
+        </div>
 
-          {/* Coluna Direita: Perfil do Usuário */}
-          <div className="flex items-center justify-end flex-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 sm:gap-3 outline-none group hover:bg-white/5 p-1 rounded-full transition-colors pr-2">
-                  <div className="h-8 w-8 shrink-0 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden group-hover:border-primary/50 transition-colors">
-                    <Avatar className="h-full w-full">
-                      <AvatarImage src={user.photoURL || ""} />
-                      <AvatarFallback className="bg-transparent text-xs font-bold text-primary-foreground uppercase">
-                        {(user.displayName?.[0] || user.email?.[0] || "U")}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <div className="flex flex-col items-start hidden xs:flex">
-                    <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate max-w-[120px]">
-                      {user.displayName || "Usuário"}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
-                      {user.email}
-                    </span>
-                  </div>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 glass-morphism border-white/10 text-white">
-                <DropdownMenuLabel className="font-headline">Minha Conta</DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Perfil</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Configurações</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem 
-                  onClick={handleLogout}
-                  className="focus:bg-destructive/20 text-destructive focus:text-destructive cursor-pointer"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sair</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </header>
-        <main className="flex-1 space-y-6 p-4 md:p-8 max-w-full overflow-x-hidden">
-          <DashboardOverview />
-        </main>
-      </SidebarInset>
+        {/* Coluna Direita: Perfil do Usuário */}
+        <div className="flex items-center justify-end flex-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 sm:gap-3 outline-none group hover:bg-white/5 p-1 rounded-full transition-colors pr-2">
+                <div className="h-8 w-8 shrink-0 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden group-hover:border-primary/50 transition-colors">
+                  <Avatar className="h-full w-full">
+                    <AvatarImage src={user.photoURL || ""} />
+                    <AvatarFallback className="bg-transparent text-xs font-bold text-primary-foreground uppercase">
+                      {(user.displayName?.[0] || user.email?.[0] || "U")}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <div className="flex flex-col items-start hidden xs:flex">
+                  <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors truncate max-w-[120px]">
+                    {user.displayName || "Usuário"}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
+                    {user.email}
+                  </span>
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 glass-morphism border-white/10 text-white">
+              <DropdownMenuLabel className="font-headline">Minha Conta</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">
+                <User className="mr-2 h-4 w-4" />
+                <span>Perfil</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Configurações</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuItem 
+                onClick={handleLogout}
+                className="focus:bg-destructive/20 text-destructive focus:text-destructive cursor-pointer"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sair</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </header>
+      <main className="flex-1 space-y-6 p-4 md:p-8 max-w-7xl mx-auto w-full overflow-x-hidden">
+        <DashboardOverview />
+      </main>
     </div>
   )
 }

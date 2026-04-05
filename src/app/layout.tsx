@@ -1,6 +1,5 @@
 import type {Metadata} from 'next';
 import './globals.css';
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { FirebaseClientProvider } from "@/firebase/client-provider";
 
@@ -23,10 +22,8 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-background text-foreground min-h-screen">
         <FirebaseClientProvider>
-          <SidebarProvider defaultOpen={true}>
-            {children}
-            <Toaster />
-          </SidebarProvider>
+          {children}
+          <Toaster />
         </FirebaseClientProvider>
       </body>
     </html>

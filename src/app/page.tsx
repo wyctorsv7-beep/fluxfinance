@@ -5,7 +5,7 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useUser, useAuth } from "@/firebase"
 import { DashboardOverview } from "@/components/dashboard/overview"
-import { Loader2, LogOut, User, Settings, Wallet } from "lucide-react"
+import { Loader2, LogOut, Wallet } from "lucide-react"
 import { signOut } from "firebase/auth"
 import {
   DropdownMenu,
@@ -16,7 +16,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ProfileSettingsModal } from "@/components/dashboard/profile-settings-modal"
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser()
@@ -84,26 +83,6 @@ export default function DashboardPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 glass-morphism border-white/10 text-white">
               <DropdownMenuLabel className="font-headline">Minha Conta</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-white/10" />
-              
-              <ProfileSettingsModal 
-                trigger={
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="focus:bg-white/10 cursor-pointer text-xs">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Perfil</span>
-                  </DropdownMenuItem>
-                }
-              />
-              
-              <ProfileSettingsModal 
-                trigger={
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="focus:bg-white/10 cursor-pointer text-xs">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Configurações</span>
-                  </DropdownMenuItem>
-                }
-              />
-              
               <DropdownMenuSeparator className="bg-white/10" />
               <DropdownMenuItem 
                 onClick={handleLogout}

@@ -2,10 +2,8 @@
 "use client"
 
 import * as React from "react"
-import { Wallet, Lock, AlertTriangle } from "lucide-react"
+import { Lock, AlertTriangle } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
 
 export default function LoginPage() {
   return (
@@ -36,9 +34,6 @@ export default function LoginPage() {
             <div className="p-4 bg-white/5 rounded-lg border border-white/5 text-sm text-center text-white/70">
               Agradecemos o interesse no Flux Finance. Para mais informações, entre em contato com o desenvolvedor.
             </div>
-            <Button variant="outline" className="w-full border-white/10 hover:bg-white/5" asChild>
-              <Link href="https://github.com">Voltar ao Portfólio</Link>
-            </Button>
           </CardContent>
         </Card>
       </div>

@@ -4,8 +4,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useUser, useAuth } from "@/firebase"
-import { DashboardOverview } from "@/components/dashboard/overview"
-import { Loader2, LogOut, Wallet } from "lucide-react"
+import { Loader2, LogOut, Wallet, Lock, AlertCircle } from "lucide-react"
 import { signOut } from "firebase/auth"
 import {
   DropdownMenu,
@@ -16,6 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser()
@@ -56,7 +57,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="flex-none flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center">
           <span className="text-sm font-bold tracking-tighter text-white font-headline">
             Flux Finance
           </span>
@@ -65,12 +66,7 @@ export default function DashboardPage() {
         <div className="flex-1 flex items-center justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 outline-none group hover:bg-white/5 p-1 rounded-full transition-all md:pr-4">
-                <div className="flex flex-col items-end text-right hidden sm:flex">
-                  <span className="text-xs font-bold text-white group-hover:text-primary transition-colors truncate max-w-[120px]">
-                    {user.displayName || "Usuário"}
-                  </span>
-                </div>
+              <button className="flex items-center gap-2 outline-none group hover:bg-white/5 p-1 rounded-full transition-all">
                 <div className="h-8 w-8 shrink-0 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden group-hover:border-primary/50 transition-colors">
                   <Avatar className="h-full w-full">
                     <AvatarImage src={user.photoURL || ""} />
@@ -95,8 +91,42 @@ export default function DashboardPage() {
           </DropdownMenu>
         </div>
       </header>
-      <main className="flex-1 space-y-4 md:space-y-6 p-3 md:p-8 max-w-7xl mx-auto w-full overflow-x-hidden">
-        <DashboardOverview />
+
+      <main className="flex-1 flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
+        {/* Background decorative elements */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+        
+        <Card className="w-full max-w-[450px] glass-morphism border-white/10 shadow-2xl relative z-10 text-center py-8">
+          <CardHeader className="space-y-4">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-destructive/10 border border-destructive/20 mb-2">
+              <Lock className="h-10 w-10 text-destructive animate-pulse" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-white font-headline">Acesso Encerrado</CardTitle>
+            <CardDescription className="text-muted-foreground text-base px-4">
+              O período de teste gratuito do Flux Finance chegou ao fim para esta conta.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="bg-white/5 rounded-xl p-4 border border-white/5 flex items-start gap-3 text-left">
+              <AlertCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+              <p className="text-sm text-white/80 leading-relaxed">
+                Agradecemos por utilizar nossa plataforma. Para continuar gerenciando suas finanças com inteligência, entre em contato com o administrador ou aguarde novas atualizações.
+              </p>
+            </div>
+            
+            <Button 
+              onClick={handleLogout}
+              className="w-full bg-primary hover:bg-primary/90 glow-primary font-bold h-12 text-base"
+            >
+              <LogOut className="mr-2 h-5 w-5" />
+              Sair da Conta
+            </Button>
+            
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold pt-4">
+              Flux Finance • Smart Management
+            </p>
+          </CardContent>
+        </Card>
       </main>
     </div>
   )

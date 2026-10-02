@@ -37,7 +37,7 @@ import { collection, serverTimestamp } from "firebase/firestore"
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 
 const formSchema = z.object({
-  amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Valor deve ser maior que zero"),
+  amount: z.string().min(1, "Valor é obrigatório"),
   goalId: z.string().min(1, "Selecione uma meta"),
 })
 
@@ -51,13 +51,31 @@ export function AddContributionModal({ goals }: { goals: any[] }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amount: "",
+      amount: "0,00",
       goalId: "",
     },
   })
 
+  const formatCurrency = (value: string) => {
+    const digits = value.replace(/\D/g, "")
+    const numberValue = parseInt(digits || "0")
+    return (numberValue / 100).toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+    })
+  }
+
+  const parseCurrency = (value: string) => {
+    return Number(value.replace(/\./g, "").replace(",", "."))
+  }
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user?.uid || !firestore) return
+
+    const amount = parseCurrency(values.amount)
+    if (amount <= 0) {
+      form.setError("amount", { message: "Valor deve ser maior que zero" })
+      return
+    }
 
     setIsSubmitting(true)
     const contributionsRef = collection(firestore, "users", user.uid, "contributions")
@@ -65,7 +83,7 @@ export function AddContributionModal({ goals }: { goals: any[] }) {
     addDocumentNonBlocking(contributionsRef, {
       userId: user.uid,
       goalId: values.goalId,
-      amount: Number(values.amount),
+      amount: amount,
       date: new Date().toISOString().split('T')[0],
       createdAt: serverTimestamp(),
     }).then(() => {
@@ -124,7 +142,11 @@ export function AddContributionModal({ goals }: { goals: any[] }) {
                 <FormItem>
                   <FormLabel>Valor do Aporte (R$)</FormLabel>
                   <FormControl>
-                    <Input placeholder="0,00" {...field} className="bg-white/5 border-white/10" />
+                    <Input 
+                      {...field} 
+                      onChange={(e) => field.onChange(formatCurrency(e.target.value))}
+                      className="bg-white/5 border-white/10" 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

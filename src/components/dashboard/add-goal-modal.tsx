@@ -31,8 +31,8 @@ import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 
 const formSchema = z.object({
   title: z.string().min(2, "Título curto demais"),
-  targetAmount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Meta deve ser maior que zero"),
-  initialAmount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, "Valor inicial não pode ser negativo"),
+  targetAmount: z.string().min(1, "Meta é obrigatória"),
+  initialAmount: z.string().min(1, "Valor inicial é obrigatório"),
 })
 
 export function AddGoalModal() {
@@ -46,13 +46,31 @@ export function AddGoalModal() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      targetAmount: "",
-      initialAmount: "0",
+      targetAmount: "0,00",
+      initialAmount: "0,00",
     },
   })
 
+  const formatCurrency = (value: string) => {
+    const digits = value.replace(/\D/g, "")
+    const numberValue = parseInt(digits || "0")
+    return (numberValue / 100).toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+    })
+  }
+
+  const parseCurrency = (value: string) => {
+    return Number(value.replace(/\./g, "").replace(",", "."))
+  }
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user?.uid || !firestore) return
+
+    const target = parseCurrency(values.targetAmount)
+    if (target <= 0) {
+      form.setError("targetAmount", { message: "Valor deve ser maior que zero" })
+      return
+    }
 
     setIsSubmitting(true)
     const goalsRef = collection(firestore, "users", user.uid, "goals")
@@ -60,8 +78,8 @@ export function AddGoalModal() {
     addDocumentNonBlocking(goalsRef, {
       userId: user.uid,
       title: values.title,
-      targetAmount: Number(values.targetAmount),
-      initialAmount: Number(values.initialAmount),
+      targetAmount: target,
+      initialAmount: parseCurrency(values.initialAmount),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     }).then(() => {
@@ -111,7 +129,11 @@ export function AddGoalModal() {
                 <FormItem>
                   <FormLabel>Valor da Meta (R$)</FormLabel>
                   <FormControl>
-                    <Input placeholder="0,00" {...field} className="bg-white/5 border-white/10" />
+                    <Input 
+                      {...field} 
+                      onChange={(e) => field.onChange(formatCurrency(e.target.value))}
+                      className="bg-white/5 border-white/10" 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -124,7 +146,11 @@ export function AddGoalModal() {
                 <FormItem>
                   <FormLabel>Quanto você já tem? (R$)</FormLabel>
                   <FormControl>
-                    <Input placeholder="0,00" {...field} className="bg-white/5 border-white/10" />
+                    <Input 
+                      {...field} 
+                      onChange={(e) => field.onChange(formatCurrency(e.target.value))}
+                      className="bg-white/5 border-white/10" 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

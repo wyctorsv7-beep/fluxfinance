@@ -7,7 +7,7 @@ import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import { Wallet, Loader2, Mail, Lock } from "lucide-react"
+import { Wallet, Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { useAuth } from "@/firebase"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { Button } from "@/components/ui/button"
@@ -30,6 +30,7 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = React.useState(false)
+  const [showPassword, setShowPassword] = React.useState(false)
   const auth = useAuth()
   const router = useRouter()
   const { toast } = useToast()
@@ -108,8 +109,20 @@ export default function LoginPage() {
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <FormControl>
-                          <Input type="password" placeholder="••••••" {...field} className="pl-10 bg-white/5 border-white/10" />
+                          <Input 
+                            type={showPassword ? "text" : "password"} 
+                            placeholder="••••••" 
+                            {...field} 
+                            className="pl-10 pr-10 bg-white/5 border-white/10" 
+                          />
                         </FormControl>
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-3 text-muted-foreground hover:text-white transition-colors outline-none"
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
                       </div>
                       <FormMessage />
                     </FormItem>

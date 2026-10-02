@@ -60,13 +60,19 @@ export function GoalsList({ goals, contributions }: GoalsListProps) {
                     </CardDescription>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right flex flex-col items-end">
                   <span className="text-lg font-bold text-white font-headline">{percent.toFixed(0)}%</span>
+                  {percent > 0 && percent < 100 && (
+                    <div className="flex items-center gap-1 text-[9px] text-accent font-bold animate-pulse mt-0.5">
+                      <TrendingUp className="h-3 w-3" />
+                      <span>EVOLUINDO</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardHeader>
             <CardContent className="p-4 md:p-6 pt-2">
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="flex justify-between text-xs md:text-sm">
                   <div className="flex flex-col">
                     <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider">Acumulado</span>
@@ -83,12 +89,6 @@ export function GoalsList({ goals, contributions }: GoalsListProps) {
                     className="h-2.5 bg-white/5" 
                     indicatorClassName={isCompleted ? "bg-accent" : "bg-primary"}
                   />
-                  {percent > 0 && percent < 100 && (
-                    <div className="absolute top-0 right-0 -mt-6 flex items-center gap-1 text-[9px] text-accent font-bold animate-pulse">
-                      <TrendingUp className="h-3 w-3" />
-                      <span>EVOLUINDO</span>
-                    </div>
-                  )}
                 </div>
                 {isCompleted && (
                   <div className="pt-2 flex items-center justify-center gap-2 text-[10px] text-accent font-bold uppercase tracking-widest bg-accent/5 py-1 rounded-md">

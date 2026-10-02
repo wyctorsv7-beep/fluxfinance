@@ -23,6 +23,14 @@ export function GoalsList({ goals, contributions }: GoalsListProps) {
     return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   }
 
+  const formatDate = (timestamp: any) => {
+    if (!mounted || !timestamp) return ""
+    if (timestamp.seconds) {
+      return new Date(timestamp.seconds * 1000).toLocaleDateString('pt-BR')
+    }
+    return ""
+  }
+
   if (goals.length === 0) {
     return (
       <Card className="glass-morphism border-white/5 py-12 flex flex-col items-center justify-center text-center">
@@ -56,7 +64,7 @@ export function GoalsList({ goals, contributions }: GoalsListProps) {
                   <div>
                     <CardTitle className="text-base md:text-lg font-bold text-white group-hover:text-primary transition-colors">{goal.title}</CardTitle>
                     <CardDescription className="text-[10px] md:text-xs text-muted-foreground">
-                      Criada em {new Date(goal.createdAt?.seconds * 1000).toLocaleDateString('pt-BR')}
+                      Criada em {formatDate(goal.createdAt)}
                     </CardDescription>
                   </div>
                 </div>

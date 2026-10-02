@@ -21,6 +21,17 @@ export function ContributionHistory({ contributions, goals }: { contributions: a
     return goals.find(g => g.id === goalId)?.title || "Meta Removida"
   }
 
+  const formatDate = (dateValue: any) => {
+    if (!mounted || !dateValue) return ""
+    // Handle Firestore Timestamps
+    if (dateValue.seconds) {
+      return new Date(dateValue.seconds * 1000).toLocaleDateString('pt-BR')
+    }
+    // Fallback for string dates
+    const date = new Date(dateValue)
+    return isNaN(date.getTime()) ? dateValue : date.toLocaleDateString('pt-BR')
+  }
+
   return (
     <Card className="glass-morphism border-white/5 h-full">
       <CardHeader className="p-4 md:p-6">
@@ -44,7 +55,7 @@ export function ContributionHistory({ contributions, goals }: { contributions: a
                       {getGoalTitle(c.goalId)}
                     </span>
                     <span className="text-[9px] text-muted-foreground uppercase">
-                      {new Date(c.date).toLocaleDateString('pt-BR')}
+                      {formatDate(c.date)}
                     </span>
                   </div>
                 </div>

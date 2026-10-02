@@ -84,7 +84,7 @@ export function AddContributionModal({ goals }: { goals: any[] }) {
       userId: user.uid,
       goalId: values.goalId,
       amount: amount,
-      date: new Date().toISOString().split('T')[0],
+      date: serverTimestamp(),
       createdAt: serverTimestamp(),
     }).then(() => {
       setOpen(false)

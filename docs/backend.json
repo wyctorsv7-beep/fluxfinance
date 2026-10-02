@@ -1,36 +1,24 @@
+
 {
   "entities": {
     "User": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a user of the Meu Bolso application. This entity stores non-authentication-related user information and links to financial data. Authentication is handled by an external system.",
+      "description": "Represents a user of the application.",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier for the User entity. This ID is typically provided by the external authentication system."
+          "type": "string"
         },
         "displayName": {
-          "type": "string",
-          "description": "The name of the user to be displayed within the application."
+          "type": "string"
         },
         "email": {
           "type": "string",
-          "description": "The user's email address, used for communication or display purposes, not for authentication.",
           "format": "email"
-        },
-        "preferredCurrency": {
-          "type": "string",
-          "description": "The user's preferred currency for financial reporting (e.g., 'BRL', 'USD')."
         },
         "createdAt": {
           "type": "string",
-          "description": "Timestamp when the user record was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the user record was last updated.",
           "format": "date-time"
         }
       },
@@ -38,170 +26,95 @@
         "id",
         "displayName",
         "email",
-        "preferredCurrency",
-        "createdAt",
-        "updatedAt"
+        "createdAt"
       ]
     },
-    "Category": {
+    "Goal": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Category",
+      "title": "Goal",
       "type": "object",
-      "description": "Represents a classification for financial transactions, such as 'Food' or 'Transport'. Categories can be user-defined or system-defined.",
+      "description": "Represents a financial goal set by the user.",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier for the Category entity."
+          "type": "string"
         },
         "userId": {
-          "type": "string",
-          "description": "Reference to the User who owns this custom category. (Relationship: User 1:N Category). System-defined categories might have this as null or a special 'system' ID."
+          "type": "string"
         },
-        "name": {
+        "title": {
           "type": "string",
-          "description": "The name of the category (e.g., 'Alimentação', 'Salário')."
+          "description": "Name of the goal (e.g., 'New Car', 'Emergency Fund')."
         },
-        "type": {
-          "type": "string",
-          "description": "The type of financial transaction this category applies to, either 'expense', 'income', or 'both'."
+        "targetAmount": {
+          "type": "number",
+          "description": "The final amount the user wants to reach."
         },
-        "iconName": {
-          "type": "string",
-          "description": "Optional: A name or identifier for an icon associated with this category for UI representation."
+        "initialAmount": {
+          "type": "number",
+          "description": "The amount the user already had when they created the goal."
         },
         "colorHex": {
-          "type": "string",
-          "description": "Optional: A hexadecimal color code for UI representation of this category."
-        },
-        "isSystemDefined": {
-          "type": "boolean",
-          "description": "Indicates if this is a default, system-provided category (true) or a user-created one (false)."
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "type",
-        "isSystemDefined"
-      ]
-    },
-    "Transaction": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Transaction",
-      "type": "object",
-      "description": "Represents a single financial movement, either an expense or an income, recorded by a user.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Transaction entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the User who recorded this transaction. (Relationship: User 1:N Transaction)"
-        },
-        "categoryId": {
-          "type": "string",
-          "description": "Reference to the Category assigned to this transaction. (Relationship: Category 1:N Transaction)"
-        },
-        "amount": {
-          "type": "number",
-          "description": "The monetary value of the transaction. Positive for income, negative for expenses."
-        },
-        "description": {
-          "type": "string",
-          "description": "A brief textual description of the transaction."
-        },
-        "transactionDate": {
-          "type": "string",
-          "description": "The date when the transaction occurred.",
-          "format": "date"
+          "type": "string"
         },
         "createdAt": {
           "type": "string",
-          "description": "Timestamp when the transaction record was created.",
           "format": "date-time"
         },
         "updatedAt": {
           "type": "string",
-          "description": "Timestamp when the transaction record was last updated.",
           "format": "date-time"
         }
       },
       "required": [
         "id",
         "userId",
-        "categoryId",
-        "amount",
-        "description",
-        "transactionDate",
+        "title",
+        "targetAmount",
+        "initialAmount",
         "createdAt",
         "updatedAt"
       ]
     },
-    "Budget": {
+    "Contribution": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Budget",
+      "title": "Contribution",
       "type": "object",
-      "description": "Represents a financial budget set by a user for a specific category and period.",
+      "description": "Represents an addition of money to a specific goal.",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier for the Budget entity."
+          "type": "string"
+        },
+        "goalId": {
+          "type": "string"
         },
         "userId": {
-          "type": "string",
-          "description": "Reference to the User who created this budget. (Relationship: User 1:N Budget)"
-        },
-        "categoryId": {
-          "type": "string",
-          "description": "Reference to the Category to which this budget applies. (Relationship: Category 1:N Budget)"
+          "type": "string"
         },
         "amount": {
-          "type": "number",
-          "description": "The target monetary amount budgeted for the specified period."
+          "type": "number"
         },
-        "startDate": {
+        "date": {
           "type": "string",
-          "description": "The start date of the budget period.",
           "format": "date"
-        },
-        "endDate": {
-          "type": "string",
-          "description": "The end date of the budget period.",
-          "format": "date"
-        },
-        "recurrenceType": {
-          "type": "string",
-          "description": "Defines how often the budget repeats (e.g., 'monthly', 'weekly', 'one-time')."
         },
         "createdAt": {
           "type": "string",
-          "description": "Timestamp when the budget record was created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the budget record was last updated.",
           "format": "date-time"
         }
       },
       "required": [
         "id",
+        "goalId",
         "userId",
-        "categoryId",
         "amount",
-        "startDate",
-        "endDate",
-        "recurrenceType",
-        "createdAt",
-        "updatedAt"
+        "date",
+        "createdAt"
       ]
     }
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "password"
     ]
   },
   "firestore": {
@@ -213,92 +126,29 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Stores individual user profile data. Access is restricted to the authenticated user matching the 'userId' path parameter. The 'id' field within the document must match the 'userId' parameter for strong ownership verification.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID of the user, matching Firebase Authentication UID."
-            }
-          ]
+          "description": "User profile data."
         }
       },
       {
-        "path": "/system_categories/{categoryId}",
+        "path": "/users/{userId}/goals/{goalId}",
         "definition": {
-          "entityName": "Category",
+          "entityName": "Goal",
           "schema": {
-            "$ref": "#/backend/entities/Category"
+            "$ref": "#/backend/entities/Goal"
           },
-          "description": "Contains system-defined categories available to all authenticated users. These categories are read-only for users. The 'isSystemDefined' field will be true. No denormalized 'userId' as these are not user-owned.",
-          "params": [
-            {
-              "name": "categoryId",
-              "description": "The unique ID of the system-defined category."
-            }
-          ]
+          "description": "User's financial goals."
         }
       },
       {
-        "path": "/users/{userId}/categories/{categoryId}",
+        "path": "/users/{userId}/contributions/{contributionId}",
         "definition": {
-          "entityName": "Category",
+          "entityName": "Contribution",
           "schema": {
-            "$ref": "#/backend/entities/Category"
+            "$ref": "#/backend/entities/Contribution"
           },
-          "description": "Stores user-defined custom categories. Each category is owned by the user specified in the path. Includes denormalized 'userId' field for authorization independence, ensuring that the document's 'userId' matches the path parameter and the authenticated user's ID.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID of the user who owns this category."
-            },
-            {
-              "name": "categoryId",
-              "description": "The unique ID of the user-defined category."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/transactions/{transactionId}",
-        "definition": {
-          "entityName": "Transaction",
-          "schema": {
-            "$ref": "#/backend/entities/Transaction"
-          },
-          "description": "Stores financial transactions recorded by a specific user. Each transaction is privately owned by the user. Includes denormalized 'userId' field for authorization independence, ensuring the document's 'userId' matches the path parameter and the authenticated user's ID.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID of the user who recorded this transaction."
-            },
-            {
-              "name": "transactionId",
-              "description": "The unique ID of the transaction."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/budgets/{budgetId}",
-        "definition": {
-          "entityName": "Budget",
-          "schema": {
-            "$ref": "#/backend/entities/Budget"
-          },
-          "description": "Stores financial budgets created by a specific user. Each budget is privately owned by the user. Includes denormalized 'userId' field for authorization independence, ensuring the document's 'userId' matches the path parameter and the authenticated user's ID.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID of the user who created this budget."
-            },
-            {
-              "name": "budgetId",
-              "description": "The unique ID of the budget."
-            }
-          ]
+          "description": "Contributions made to goals."
         }
       }
-    ],
-    "reasoning": "The Firestore structure for Meu Bolso prioritizes robust security, scalability, and debuggability by adhering to the core design principles, especially Authorization Independence and Structural Segregation.\n\n**Authorization Independence:** All user-specific data is structured under `/users/{userId}/...`. This path-based ownership is critical for authorization independence. For example, a user's transactions are stored at `/users/{userId}/transactions/{transactionId}`. The `userId` in the path segment directly matches `request.auth.uid` in security rules, eliminating the need for expensive and complex `get()` calls to parent documents to determine ownership. The `userId` field is also explicitly included in the `Transaction`, `Category` (for user-defined), and `Budget` documents as denormalized authorization context, further simplifying rules and ensuring data integrity even if paths were to change (though path-based rules are the primary mechanism here).\n\n**Querying and Authorization Posture (QAPs - Rules are not Filters):**\n\n1.  **`/users/{userId}`:** This collection stores individual user profiles. Access is strictly limited to the authenticated user whose `uid` matches `{userId}`. This ensures that `list` operations on `/users` by general users are implicitly denied, and direct reads/writes are only permitted for the owning user, making it inherently secure against unauthorized data exposure.\n2.  **`/system_categories`:** This collection houses categories defined by the application. Its security posture is public read for all authenticated users, but write access is restricted (e.g., to an admin role, not defined here but easily extendable). Any `list` query on `/system_categories` is secure because all documents within it are intentionally public-read for authenticated users. This segregation ensures a homogeneous security posture for this collection.\n3.  **`/users/{userId}/categories` (User-Defined):** These categories are private to each user. By nesting them under `/users/{userId}`, `list` operations are naturally scoped to the `{userId}` in the path, meaning a user can only query and retrieve their own categories. This structure guarantees that `list` queries cannot return data belonging to other users, satisfying QAP principles.\n4.  **`/users/{userId}/transactions` and `/users/{userId}/budgets`:** Similarly, transactions and budgets are private to the user. Their hierarchical placement under `/users/{userId}` ensures that any `list` operation on these subcollections is automatically filtered by the `userId` in the path, allowing users to efficiently query their own financial records without inadvertently accessing or being exposed to other users' data. The `userId` field within each document serves as denormalized ownership, reinforcing the security rules.\n\n**Structural Segregation:** The `Category` entity, having both system-defined and user-defined variants, is a prime example of Structural Segregation. Instead of mixing them in a single collection and using a boolean field (`isSystemDefined`) as a security filter in rules (which would violate QAPs for `list` operations), they are separated into `/system_categories` (public-read) and `/users/{userId}/categories` (user-private). This significantly simplifies security rules for categories and improves query performance as rules don't need to filter on document content to determine visibility.\n\nThis design leverages Firestore's hierarchical nature to provide clear, maintainable, and highly secure access control, aligning with all specified design principles and mandates."
+    ]
   }
 }

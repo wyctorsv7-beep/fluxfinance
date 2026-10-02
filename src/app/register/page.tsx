@@ -8,8 +8,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Wallet, Loader2, Mail, Lock, User, Eye, EyeOff } from "lucide-react"
-import { useAuth } from "@/firebase"
+import { useAuth, useFirestore } from "@/firebase"
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
+import { doc, serverTimestamp } from "firebase/firestore"
+import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -33,6 +35,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
   const auth = useAuth()
+  const firestore = useFirestore()
   const router = useRouter()
   const { toast } = useToast()
 
@@ -49,9 +52,22 @@ export default function RegisterPage() {
     setIsLoading(true)
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password)
-      await updateProfile(userCredential.user, {
+      const user = userCredential.user
+
+      // Atualiza o perfil no Auth
+      await updateProfile(user, {
         displayName: values.name
       })
+
+      // Salva os dados do usuário no Firestore
+      const userRef = doc(firestore, "users", user.uid)
+      setDocumentNonBlocking(userRef, {
+        id: user.uid,
+        displayName: values.name,
+        email: values.email,
+        createdAt: serverTimestamp(),
+      }, { merge: true })
+
       toast({
         title: "Conta criada!",
         description: `Bem-vindo ao Flux Finance, ${values.name}.`,

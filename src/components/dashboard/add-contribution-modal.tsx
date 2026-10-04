@@ -66,6 +66,13 @@ export function AddContributionModal({ goals, open, onOpenChange, showTrigger = 
     },
   })
 
+  // Limpa o formulário quando o modal é fechado
+  React.useEffect(() => {
+    if (!isOpen) {
+      form.reset()
+    }
+  }, [isOpen, form])
+
   const formatCurrency = (value: string) => {
     const digits = value.replace(/\D/g, "")
     const numberValue = parseInt(digits || "0")
@@ -98,7 +105,6 @@ export function AddContributionModal({ goals, open, onOpenChange, showTrigger = 
       createdAt: serverTimestamp(),
     }).then(() => {
       setIsOpen(false)
-      form.reset()
       toast({ title: "Aporte registrado!", description: "Seu progresso foi atualizado." })
     }).finally(() => {
       setIsSubmitting(false)
@@ -130,7 +136,7 @@ export function AddContributionModal({ goals, open, onOpenChange, showTrigger = 
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Escolha a Meta</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="bg-white/5 border-white/10">
                         <SelectValue placeholder={goals.length > 0 ? "Selecione uma meta" : "Nenhuma meta criada"} />

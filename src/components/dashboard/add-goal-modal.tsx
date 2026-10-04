@@ -60,6 +60,13 @@ export function AddGoalModal({ open, onOpenChange, showTrigger = true }: AddGoal
     },
   })
 
+  // Limpa o formulário quando o modal é fechado
+  React.useEffect(() => {
+    if (!isOpen) {
+      form.reset()
+    }
+  }, [isOpen, form])
+
   const formatCurrency = (value: string) => {
     const digits = value.replace(/\D/g, "")
     const numberValue = parseInt(digits || "0")
@@ -93,7 +100,6 @@ export function AddGoalModal({ open, onOpenChange, showTrigger = true }: AddGoal
       updatedAt: serverTimestamp(),
     }).then(() => {
       setIsOpen(false)
-      form.reset()
       toast({ title: "Meta criada!", description: `${values.title} foi adicionada aos seus objetivos.` })
     }).finally(() => {
       setIsSubmitting(false)

@@ -124,7 +124,7 @@ export default function DashboardPage() {
         <DashboardOverview goals={goals || []} contributions={contributions || []} />
       </main>
 
-      {/* Modais Controlados */}
+      {/* Modais Controlados - Renderizados fora do menu para evitar conflitos de foco */}
       <AddGoalModal 
         open={isGoalModalOpen} 
         onOpenChange={setIsGoalModalOpen} 
@@ -137,7 +137,7 @@ export default function DashboardPage() {
         showTrigger={false} 
       />
 
-      {/* Fixed Bottom Nav with Dropdown */}
+      {/* Fixed Bottom Nav */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-xl border-t border-white/5 h-20 z-50 px-6 flex items-center justify-center shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)]">
         <div className="max-w-md w-full flex items-center justify-between">
           <button className="flex flex-col items-center gap-1 text-primary transition-all active:scale-90">
@@ -152,14 +152,25 @@ export default function DashboardPage() {
                   <Plus className="h-8 w-8" />
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-48 mb-4 glass-morphism border-white/10 text-white">
+              <DropdownMenuContent align="center" className="w-48 mb-4 glass-morphism border-white/10 text-white" sideOffset={10}>
                 <DropdownMenuLabel className="text-xs uppercase tracking-widest text-muted-foreground">O que deseja fazer?</DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem onClick={() => setIsGoalModalOpen(true)} className="flex items-center gap-2 cursor-pointer focus:bg-primary/20">
+                <DropdownMenuItem 
+                  onSelect={() => {
+                    // Timeout garante que o menu feche antes do modal abrir, evitando travamento da UI
+                    setTimeout(() => setIsGoalModalOpen(true), 150)
+                  }}
+                  className="flex items-center gap-2 cursor-pointer focus:bg-primary/20"
+                >
                   <Target className="h-4 w-4 text-primary" />
                   <span>Nova Meta</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIsContributionModalOpen(true)} className="flex items-center gap-2 cursor-pointer focus:bg-accent/20">
+                <DropdownMenuItem 
+                  onSelect={() => {
+                    setTimeout(() => setIsContributionModalOpen(true), 150)
+                  }}
+                  className="flex items-center gap-2 cursor-pointer focus:bg-accent/20"
+                >
                   <Coins className="h-4 w-4 text-accent" />
                   <span>Novo Aporte</span>
                 </DropdownMenuItem>

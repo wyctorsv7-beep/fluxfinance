@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -71,7 +70,6 @@ export function DashboardOverview() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white font-headline">Minhas Metas</h2>
-          <p className="text-sm text-muted-foreground">Acompanhe seu progresso e realize seus sonhos.</p>
         </div>
         <div className="flex gap-2">
           <AddContributionModal goals={goals || []} />
@@ -93,7 +91,7 @@ export function DashboardOverview() {
         <Card className="glass-morphism border-white/5">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Meta Geral</CardTitle>
-            <Target className="h-4 w-4 text-accent" />
+            <Target className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white font-headline">{formatCurrency(totals.target)}</div>

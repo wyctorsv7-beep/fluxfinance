@@ -87,7 +87,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="flex-[2] flex items-center justify-center sm:justify-center">
+        <div className="flex-[2] flex items-center justify-center">
           <span className="text-base font-bold tracking-tighter text-white font-headline sm:hidden">
             Flux Finance
           </span>
@@ -102,7 +102,7 @@ export default function DashboardPage() {
                     {user.displayName || "Usuário"}
                   </p>
                   <p className="text-[8px] text-muted-foreground uppercase tracking-widest mt-0.5">
-                    Ver Perfil
+                    Perfil
                   </p>
                 </div>
                 <div className="h-9 w-9 shrink-0 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden group-hover:border-primary/50 transition-colors">
@@ -160,12 +160,12 @@ export default function DashboardPage() {
         showTrigger={false}
       />
 
-      {/* Fixed Bottom Nav - Otimizado para Mobile */}
+      {/* Fixed Bottom Nav - Simplificado sem a opção Conta */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card/90 backdrop-blur-xl border-t border-white/5 h-20 z-50 px-6 flex items-center justify-center shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)] md:h-16">
-        <div className="max-w-md w-full flex items-center justify-between gap-4">
+        <div className="max-w-[300px] w-full flex items-center justify-around gap-8">
           <button 
             onClick={() => router.push("/")}
-            className="flex flex-col items-center gap-1 text-primary transition-all active:scale-90 flex-1"
+            className="flex flex-col items-center gap-1 text-primary transition-all active:scale-90"
           >
             <Home className="h-5 w-5 md:h-6 md:w-6" />
             <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-tighter">Início</span>
@@ -202,14 +202,6 @@ export default function DashboardPage() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-
-          <button 
-            onClick={() => setIsProfileModalOpen(true)}
-            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-primary transition-all active:scale-90 flex-1"
-          >
-            <Settings className="h-5 w-5 md:h-6 md:w-6" />
-            <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-tighter">Conta</span>
-          </button>
         </div>
       </nav>
     </div>

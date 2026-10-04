@@ -4,7 +4,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useUser, useAuth } from "@/firebase"
-import { Loader2, LogOut, Wallet, LayoutDashboard, Target, Home } from "lucide-react"
+import { Loader2, LogOut, Wallet, Plus, Home } from "lucide-react"
 import { signOut } from "firebase/auth"
 import {
   DropdownMenu,
@@ -106,11 +106,10 @@ export default function DashboardPage() {
             <span className="text-[9px] font-bold uppercase tracking-tighter">Início</span>
           </button>
           
-          <div className="flex flex-col items-center justify-center -mt-10">
-            <div className="h-14 w-14 rounded-full bg-primary glow-primary flex items-center justify-center text-white border-4 border-background shadow-2xl active:scale-90 transition-all cursor-pointer">
-              <Target className="h-7 w-7" />
+          <div className="flex flex-col items-center justify-center -mt-12">
+            <div className="h-16 w-16 rounded-full bg-primary glow-primary flex items-center justify-center text-white border-4 border-background shadow-2xl active:scale-95 transition-all cursor-pointer">
+              <Plus className="h-8 w-8" />
             </div>
-            <span className="text-[9px] font-bold uppercase tracking-tighter mt-2 text-white">Minhas Metas</span>
           </div>
 
           <button 

@@ -4,7 +4,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useUser, useAuth, useFirestore, useCollection, useMemoFirebase } from "@/firebase"
-import { Loader2, LogOut, Wallet, Plus, Home, Target, Coins, User as UserIcon, Settings } from "lucide-react"
+import { Loader2, LogOut, Wallet, Plus, Home, Target, Coins, User as UserIcon, Settings, Clock } from "lucide-react"
 import { signOut } from "firebase/auth"
 import { collection, query, orderBy } from "firebase/firestore"
 import {
@@ -160,9 +160,9 @@ export default function DashboardPage() {
         showTrigger={false}
       />
 
-      {/* Fixed Bottom Nav - Simplificado sem a opção Conta */}
+      {/* Fixed Bottom Nav */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card/90 backdrop-blur-xl border-t border-white/5 h-20 z-50 px-6 flex items-center justify-center shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)] md:h-16">
-        <div className="max-w-[300px] w-full flex items-center justify-around gap-8">
+        <div className="max-w-[400px] w-full flex items-center justify-between gap-4">
           <button 
             onClick={() => router.push("/")}
             className="flex flex-col items-center gap-1 text-primary transition-all active:scale-90"
@@ -202,6 +202,14 @@ export default function DashboardPage() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+
+          <button 
+            onClick={() => router.push("/contributions")}
+            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-primary transition-all active:scale-90"
+          >
+            <Clock className="h-5 w-5 md:h-6 md:w-6" />
+            <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-tighter">Aportes</span>
+          </button>
         </div>
       </nav>
     </div>

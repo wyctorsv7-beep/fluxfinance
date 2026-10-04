@@ -35,15 +35,21 @@ const profileFormSchema = z.object({
 })
 
 interface ProfileSettingsModalProps {
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  showTrigger?: boolean
   trigger?: React.ReactNode
 }
 
-export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
+export function ProfileSettingsModal({ open, onOpenChange, showTrigger = true, trigger }: ProfileSettingsModalProps) {
   const { user } = useUser()
   const auth = useAuth()
-  const [open, setOpen] = React.useState(false)
+  const [internalOpen, setInternalOpen] = React.useState(false)
   const [isLoading, setIsLoading] = React.useState(false)
   const { toast } = useToast()
+
+  const isOpen = open !== undefined ? open : internalOpen
+  const setIsOpen = onOpenChange !== undefined ? onOpenChange : setInternalOpen
 
   const form = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
@@ -54,16 +60,15 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
     },
   })
 
-  // Sincroniza apenas quando o modal abre para não atrapalhar a digitação
   React.useEffect(() => {
-    if (open && user) {
+    if (isOpen && user) {
       form.reset({
         name: user.displayName || "",
         email: user.email || "",
         password: "",
       })
     }
-  }, [open, user, form])
+  }, [isOpen, user, form])
 
   async function onSubmit(values: z.infer<typeof profileFormSchema>) {
     const currentUser = auth.currentUser
@@ -86,18 +91,14 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
 
       if (values.password && values.password.length >= 6) {
         promises.push(updatePassword(currentUser, values.password))
-      } else if (values.password && values.password.length < 6) {
-        throw new Error("A nova senha deve ter pelo menos 6 caracteres.")
       }
 
       if (promises.length > 0) {
         await Promise.all(promises)
         toast({ title: "Sucesso", description: "Dados atualizados com sucesso!" })
-      } else {
-        toast({ description: "Nenhuma alteração detectada." })
       }
       
-      setOpen(false)
+      setIsOpen(false)
     } catch (error: any) {
       console.error("Erro ao atualizar perfil:", error)
       let msg = "Erro ao salvar alterações."
@@ -106,27 +107,29 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
       } else {
         msg = error.message || msg
       }
-      toast({ variant: "destructive", title: "Erro na atualização", description: msg })
+      toast({ variant: "destructive", title: "Erro", description: msg })
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button variant="ghost" className="w-full justify-start gap-2 text-xs h-8 px-2 font-normal">
-            <Settings className="h-4 w-4" />
-            Configurações
-          </Button>
-        )}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[400px] glass-morphism border-white/10 text-white" onOpenAutoFocus={(e) => e.preventDefault()}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {showTrigger && (
+        <DialogTrigger asChild>
+          {trigger || (
+            <Button variant="ghost" className="w-full justify-start gap-2 text-xs h-8 px-2 font-normal">
+              <Settings className="h-4 w-4" />
+              Configurações
+            </Button>
+          )}
+        </DialogTrigger>
+      )}
+      <DialogContent className="sm:max-w-[400px] glass-morphism border-white/10 text-white">
         <DialogHeader>
           <DialogTitle className="text-xl font-headline font-bold">Configurações de Perfil</DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            Mantenha seus dados atualizados.
+          <DialogDescription className="text-muted-foreground text-xs">
+            Mantenha seus dados atualizados para uma melhor experiência.
           </DialogDescription>
         </DialogHeader>
 
@@ -139,12 +142,11 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
                 <FormItem>
                   <FormLabel>Nome</FormLabel>
                   <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <FormControl>
                       <Input 
                         {...field} 
-                        className="pl-10 bg-white/5 border-white/10 focus-visible:ring-primary" 
-                        placeholder="Seu nome"
+                        className="pl-10 bg-white/5 border-white/10" 
                         disabled={isLoading}
                       />
                     </FormControl>
@@ -160,12 +162,12 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
                 <FormItem>
                   <FormLabel>E-mail</FormLabel>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <FormControl>
                       <Input 
                         type="email" 
                         {...field} 
-                        className="pl-10 bg-white/5 border-white/10 focus-visible:ring-primary" 
+                        className="pl-10 bg-white/5 border-white/10" 
                         disabled={isLoading}
                       />
                     </FormControl>
@@ -181,13 +183,13 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
                 <FormItem>
                   <FormLabel>Nova Senha (opcional)</FormLabel>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground pointer-events-none" />
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <FormControl>
                       <Input 
                         type="password" 
                         placeholder="Mínimo 6 caracteres" 
                         {...field} 
-                        className="pl-10 bg-white/5 border-white/10 focus-visible:ring-primary" 
+                        className="pl-10 bg-white/5 border-white/10" 
                         disabled={isLoading}
                       />
                     </FormControl>
@@ -196,7 +198,7 @@ export function ProfileSettingsModal({ trigger }: ProfileSettingsModalProps) {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 mt-2" disabled={isLoading}>
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 mt-2 font-bold" disabled={isLoading}>
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : "Salvar Alterações"}
             </Button>
           </form>

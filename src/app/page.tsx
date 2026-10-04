@@ -4,7 +4,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useUser, useAuth, useFirestore, useCollection, useMemoFirebase } from "@/firebase"
-import { Loader2, LogOut, Wallet, Plus, Home, Target, Coins } from "lucide-react"
+import { Loader2, LogOut, Wallet, Plus, Home, Target, Coins, User as UserIcon, Settings } from "lucide-react"
 import { signOut } from "firebase/auth"
 import { collection, query, orderBy } from "firebase/firestore"
 import {
@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DashboardOverview } from "@/components/dashboard/overview"
 import { AddGoalModal } from "@/components/dashboard/add-goal-modal"
 import { AddContributionModal } from "@/components/dashboard/add-contribution-modal"
+import { ProfileSettingsModal } from "@/components/dashboard/profile-settings-modal"
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser()
@@ -28,6 +29,7 @@ export default function DashboardPage() {
 
   const [isGoalModalOpen, setIsGoalModalOpen] = React.useState(false)
   const [isContributionModalOpen, setIsContributionModalOpen] = React.useState(false)
+  const [isProfileModalOpen, setIsProfileModalOpen] = React.useState(false)
 
   const goalsQuery = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null
@@ -79,11 +81,14 @@ export default function DashboardPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20">
               <Wallet className="h-5 w-5" />
             </div>
+            <span className="text-sm font-bold tracking-tighter text-white font-headline hidden sm:block">
+              Flux Finance
+            </span>
           </div>
         </div>
 
-        <div className="flex-[2] flex items-center justify-center">
-          <span className="text-base md:text-lg font-bold tracking-tighter text-white font-headline">
+        <div className="flex-[2] flex items-center justify-center sm:justify-center">
+          <span className="text-base font-bold tracking-tighter text-white font-headline sm:hidden">
             Flux Finance
           </span>
         </div>
@@ -92,21 +97,34 @@ export default function DashboardPage() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 outline-none group hover:bg-white/5 p-1 rounded-full transition-all">
-                <span className="text-xs font-medium text-white/70 hidden lg:block group-hover:text-white transition-colors">
-                  {user.displayName || user.email}
-                </span>
-                <div className="h-8 w-8 shrink-0 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden group-hover:border-primary/50 transition-colors">
+                <div className="text-right hidden md:block">
+                  <p className="text-[10px] font-bold text-white leading-none">
+                    {user.displayName || "Usuário"}
+                  </p>
+                  <p className="text-[8px] text-muted-foreground uppercase tracking-widest mt-0.5">
+                    Ver Perfil
+                  </p>
+                </div>
+                <div className="h-9 w-9 shrink-0 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden group-hover:border-primary/50 transition-colors">
                   <Avatar className="h-full w-full">
                     <AvatarImage src={user.photoURL || ""} />
-                    <AvatarFallback className="bg-transparent text-xs font-bold text-primary-foreground uppercase">
-                      {(user.displayName?.[0] || user.email?.[0] || "U")}
+                    <AvatarFallback className="bg-transparent text-xs font-bold text-primary uppercase">
+                      {(user.displayName?.[0] || user.email?.[0] || <UserIcon className="h-4 w-4" />)}
                     </AvatarFallback>
                   </Avatar>
                 </div>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 glass-morphism border-white/10 text-white">
-              <DropdownMenuLabel className="font-headline">Minha Conta</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-56 glass-morphism border-white/10 text-white" sideOffset={8}>
+              <DropdownMenuLabel className="font-headline text-xs">Minha Conta</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuItem 
+                onSelect={() => setIsProfileModalOpen(true)}
+                className="flex items-center gap-2 cursor-pointer focus:bg-white/10"
+              >
+                <Settings className="h-4 w-4 text-primary" />
+                <span>Configurações</span>
+              </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-white/10" />
               <DropdownMenuItem 
                 onClick={handleLogout}
@@ -136,11 +154,19 @@ export default function DashboardPage() {
         onOpenChange={setIsContributionModalOpen} 
         showTrigger={false} 
       />
+      <ProfileSettingsModal 
+        open={isProfileModalOpen}
+        onOpenChange={setIsProfileModalOpen}
+        showTrigger={false}
+      />
 
       {/* Fixed Bottom Nav - Otimizado para Mobile */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card/90 backdrop-blur-xl border-t border-white/5 h-20 z-50 px-6 flex items-center justify-center shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)] md:h-16">
         <div className="max-w-md w-full flex items-center justify-between gap-4">
-          <button className="flex flex-col items-center gap-1 text-primary transition-all active:scale-90 flex-1">
+          <button 
+            onClick={() => router.push("/")}
+            className="flex flex-col items-center gap-1 text-primary transition-all active:scale-90 flex-1"
+          >
             <Home className="h-5 w-5 md:h-6 md:w-6" />
             <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-tighter">Início</span>
           </button>
@@ -153,7 +179,7 @@ export default function DashboardPage() {
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-48 mb-4 glass-morphism border-white/10 text-white" sideOffset={10}>
-                <DropdownMenuLabel className="text-xs uppercase tracking-widest text-muted-foreground">O que deseja fazer?</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-muted-foreground text-center">Ações Rápidas</DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/10" />
                 <DropdownMenuItem 
                   onSelect={() => {
@@ -168,9 +194,9 @@ export default function DashboardPage() {
                   onSelect={() => {
                     setTimeout(() => setIsContributionModalOpen(true), 150)
                   }}
-                  className="flex items-center gap-2 cursor-pointer focus:bg-accent/20"
+                  className="flex items-center gap-2 cursor-pointer focus:bg-primary/20"
                 >
-                  <Coins className="h-4 w-4 text-accent" />
+                  <Coins className="h-4 w-4 text-primary" />
                   <span>Novo Aporte</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -178,11 +204,11 @@ export default function DashboardPage() {
           </div>
 
           <button 
-            onClick={handleLogout}
-            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-destructive transition-all active:scale-90 flex-1"
+            onClick={() => setIsProfileModalOpen(true)}
+            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-primary transition-all active:scale-90 flex-1"
           >
-            <LogOut className="h-5 w-5 md:h-6 md:w-6" />
-            <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-tighter">Sair</span>
+            <Settings className="h-5 w-5 md:h-6 md:w-6" />
+            <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-tighter">Conta</span>
           </button>
         </div>
       </nav>

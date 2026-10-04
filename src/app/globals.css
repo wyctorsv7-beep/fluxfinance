@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -44,8 +45,15 @@
   * {
     @apply border-border;
   }
+  html {
+    @apply bg-black;
+    height: -webkit-fill-available;
+  }
   body {
     @apply bg-background text-foreground;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overscroll-behavior-y: none;
   }
 }
 
@@ -59,4 +67,9 @@
 
 .glow-accent {
   box-shadow: 0 0 20px -5px hsl(var(--accent) / 0.5);
+}
+
+/* Ajuste para safe areas em iPhones modernos */
+.safe-padding-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
 }

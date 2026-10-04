@@ -5,7 +5,6 @@ import * as React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Target, Wallet, Coins } from "lucide-react"
 import { GoalsList } from "./goals-list"
-import { ContributionHistory } from "./contribution-history"
 
 interface DashboardOverviewProps {
   goals: any[]
@@ -77,13 +76,8 @@ export function DashboardOverview({ goals, contributions }: DashboardOverviewPro
         </Card>
       </div>
 
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-6">
-          <GoalsList goals={goals} contributions={contributions} />
-        </div>
-        <div className="lg:col-span-1">
-          <ContributionHistory contributions={contributions} goals={goals} />
-        </div>
+      <div className="max-w-3xl mx-auto w-full">
+        <GoalsList goals={goals} contributions={contributions} />
       </div>
     </div>
   )

@@ -101,9 +101,9 @@ export default function ContributionsPage() {
           </button>
         </div>
 
-        <div className="flex-[2] flex items-center justify-center">
-          <span className="text-base font-bold tracking-tighter text-white font-headline">
-            Histórico de Aportes
+        <div className="flex-1 flex items-center justify-center">
+          <span className="text-base font-bold tracking-tighter text-white font-headline uppercase">
+            Flux Finance
           </span>
         </div>
 
@@ -149,7 +149,7 @@ export default function ContributionsPage() {
           <CardHeader>
             <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
               <Clock className="h-5 w-5 text-primary" />
-              Todos os Aportes
+              Histórico de Aportes
             </CardTitle>
             <CardDescription className="text-xs text-muted-foreground">
               Acompanhe cada centavo investido nos seus objetivos.

@@ -81,14 +81,11 @@ export default function DashboardPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-primary/20">
               <Wallet className="h-5 w-5" />
             </div>
-            <span className="text-sm font-bold tracking-tighter text-white font-headline hidden sm:block">
-              Flux Finance
-            </span>
           </div>
         </div>
 
-        <div className="flex-[2] flex items-center justify-center">
-          <span className="text-base font-bold tracking-tighter text-white font-headline sm:hidden">
+        <div className="flex-1 flex items-center justify-center">
+          <span className="text-base font-bold tracking-tighter text-white font-headline uppercase">
             Flux Finance
           </span>
         </div>

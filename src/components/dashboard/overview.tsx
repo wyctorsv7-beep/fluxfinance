@@ -40,39 +40,39 @@ export function DashboardOverview({ goals, contributions }: DashboardOverviewPro
     <div className="space-y-6 animate-in fade-in duration-700 pb-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white font-headline">Minhas Metas</h2>
+          <h2 className="text-xl md:text-3xl font-bold tracking-tight text-white font-headline">Minhas Metas</h2>
         </div>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+      <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-3">
         <Card className="glass-morphism border-white/5 relative overflow-hidden group">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Total Guardado</CardTitle>
-            <Wallet className="h-4 w-4 text-primary" />
+          <CardHeader className="flex flex-row items-center justify-between pb-1 space-y-0 px-4 pt-4 md:px-6 md:pt-6">
+            <CardTitle className="text-[9px] md:text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Total Guardado</CardTitle>
+            <Wallet className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white font-headline">{formatCurrency(totals.saved)}</div>
-            <p className="text-[10px] text-muted-foreground mt-1">Soma de todos os objetivos</p>
+          <CardContent className="px-4 pb-4 md:px-6 md:pb-6">
+            <div className="text-lg md:text-2xl font-bold text-white font-headline truncate">{formatCurrency(totals.saved)}</div>
+            <p className="text-[8px] md:text-[10px] text-muted-foreground mt-0.5">Soma de todos os objetivos</p>
           </CardContent>
         </Card>
         <Card className="glass-morphism border-white/5">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Meta Geral</CardTitle>
-            <Target className="h-4 w-4 text-primary" />
+          <CardHeader className="flex flex-row items-center justify-between pb-1 space-y-0 px-4 pt-4 md:px-6 md:pt-6">
+            <CardTitle className="text-[9px] md:text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Meta Geral</CardTitle>
+            <Target className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white font-headline">{formatCurrency(totals.target)}</div>
-            <p className="text-[10px] text-muted-foreground mt-1">Total planejado</p>
+          <CardContent className="px-4 pb-4 md:px-6 md:pb-6">
+            <div className="text-lg md:text-2xl font-bold text-white font-headline truncate">{formatCurrency(totals.target)}</div>
+            <p className="text-[8px] md:text-[10px] text-muted-foreground mt-0.5">Total planejado</p>
           </CardContent>
         </Card>
         <Card className="glass-morphism border-white/5">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Objetivos Ativos</CardTitle>
-            <Coins className="h-4 w-4 text-orange-500" />
+          <CardHeader className="flex flex-row items-center justify-between pb-1 space-y-0 px-4 pt-4 md:px-6 md:pt-6">
+            <CardTitle className="text-[9px] md:text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Objetivos Ativos</CardTitle>
+            <Coins className="h-3.5 w-3.5 md:h-4 md:w-4 text-orange-500" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white font-headline">{totals.active}</div>
-            <p className="text-[10px] text-muted-foreground mt-1">Metas em andamento</p>
+          <CardContent className="px-4 pb-4 md:px-6 md:pb-6">
+            <div className="text-lg md:text-2xl font-bold text-white font-headline">{totals.active}</div>
+            <p className="text-[8px] md:text-[10px] text-muted-foreground mt-0.5">Metas em andamento</p>
           </CardContent>
         </Card>
       </div>

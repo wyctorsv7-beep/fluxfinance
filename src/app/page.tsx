@@ -82,8 +82,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="flex-1 flex items-center justify-center">
-          <span className="text-base font-bold tracking-tighter text-white font-headline">
+        <div className="flex-[2] flex items-center justify-center">
+          <span className="text-base md:text-lg font-bold tracking-tighter text-white font-headline">
             Flux Finance
           </span>
         </div>
@@ -92,7 +92,7 @@ export default function DashboardPage() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 outline-none group hover:bg-white/5 p-1 rounded-full transition-all">
-                <span className="text-xs font-medium text-white/70 hidden sm:block group-hover:text-white transition-colors">
+                <span className="text-xs font-medium text-white/70 hidden lg:block group-hover:text-white transition-colors">
                   {user.displayName || user.email}
                 </span>
                 <div className="h-8 w-8 shrink-0 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden group-hover:border-primary/50 transition-colors">
@@ -120,11 +120,11 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pb-32">
+      <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pb-32 md:pb-8">
         <DashboardOverview goals={goals || []} contributions={contributions || []} />
       </main>
 
-      {/* Modais Controlados - Renderizados fora do menu para evitar conflitos de foco */}
+      {/* Modais Controlados */}
       <AddGoalModal 
         open={isGoalModalOpen} 
         onOpenChange={setIsGoalModalOpen} 
@@ -137,19 +137,19 @@ export default function DashboardPage() {
         showTrigger={false} 
       />
 
-      {/* Fixed Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-xl border-t border-white/5 h-20 z-50 px-6 flex items-center justify-center shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)]">
-        <div className="max-w-md w-full flex items-center justify-between">
-          <button className="flex flex-col items-center gap-1 text-primary transition-all active:scale-90">
-            <Home className="h-6 w-6" />
-            <span className="text-[9px] font-bold uppercase tracking-tighter">Início</span>
+      {/* Fixed Bottom Nav - Otimizado para Mobile */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-card/90 backdrop-blur-xl border-t border-white/5 h-20 z-50 px-6 flex items-center justify-center shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)] md:h-16">
+        <div className="max-w-md w-full flex items-center justify-between gap-4">
+          <button className="flex flex-col items-center gap-1 text-primary transition-all active:scale-90 flex-1">
+            <Home className="h-5 w-5 md:h-6 md:w-6" />
+            <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-tighter">Início</span>
           </button>
           
-          <div className="flex flex-col items-center justify-center -mt-12">
+          <div className="flex flex-col items-center justify-center -mt-10 md:-mt-8">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="h-16 w-16 rounded-full bg-primary glow-primary flex items-center justify-center text-white border-4 border-background shadow-2xl active:scale-95 transition-all cursor-pointer">
-                  <Plus className="h-8 w-8" />
+                <div className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-primary glow-primary flex items-center justify-center text-white border-4 border-background shadow-2xl active:scale-95 transition-all cursor-pointer">
+                  <Plus className="h-7 w-7 md:h-8 md:w-8" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-48 mb-4 glass-morphism border-white/10 text-white" sideOffset={10}>
@@ -157,7 +157,6 @@ export default function DashboardPage() {
                 <DropdownMenuSeparator className="bg-white/10" />
                 <DropdownMenuItem 
                   onSelect={() => {
-                    // Timeout garante que o menu feche antes do modal abrir, evitando travamento da UI
                     setTimeout(() => setIsGoalModalOpen(true), 150)
                   }}
                   className="flex items-center gap-2 cursor-pointer focus:bg-primary/20"
@@ -180,10 +179,10 @@ export default function DashboardPage() {
 
           <button 
             onClick={handleLogout}
-            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-destructive transition-all active:scale-90"
+            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-destructive transition-all active:scale-90 flex-1"
           >
-            <LogOut className="h-6 w-6" />
-            <span className="text-[9px] font-bold uppercase tracking-tighter">Sair</span>
+            <LogOut className="h-5 w-5 md:h-6 md:w-6" />
+            <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-tighter">Sair</span>
           </button>
         </div>
       </nav>

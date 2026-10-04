@@ -5,7 +5,7 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Target, Loader2, Plus } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -35,12 +35,21 @@ const formSchema = z.object({
   initialAmount: z.string().min(1, "Valor inicial é obrigatório"),
 })
 
-export function AddGoalModal() {
+interface AddGoalModalProps {
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  showTrigger?: boolean
+}
+
+export function AddGoalModal({ open, onOpenChange, showTrigger = true }: AddGoalModalProps) {
   const { user } = useUser()
   const firestore = useFirestore()
-  const [open, setOpen] = React.useState(false)
+  const [internalOpen, setInternalOpen] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const { toast } = useToast()
+
+  const isOpen = open !== undefined ? open : internalOpen
+  const setIsOpen = onOpenChange !== undefined ? onOpenChange : setInternalOpen
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -83,7 +92,7 @@ export function AddGoalModal() {
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     }).then(() => {
-      setOpen(false)
+      setIsOpen(false)
       form.reset()
       toast({ title: "Meta criada!", description: `${values.title} foi adicionada aos seus objetivos.` })
     }).finally(() => {
@@ -92,13 +101,14 @@ export function AddGoalModal() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-primary glow-primary text-white hover:bg-primary/90 flex gap-2">
-          <Plus className="h-4 w-4" />
-          Nova Meta
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {showTrigger && (
+        <DialogTrigger asChild>
+          <Button className="bg-primary glow-primary text-white hover:bg-primary/90">
+            Nova Meta
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[400px] glass-morphism border-white/10 text-white">
         <DialogHeader>
           <DialogTitle className="text-xl font-headline font-bold">Criar Nova Meta</DialogTitle>

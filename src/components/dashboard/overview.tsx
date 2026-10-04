@@ -1,46 +1,25 @@
+
 "use client"
 
 import * as React from "react"
-import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase"
-import { collection, query, orderBy } from "firebase/firestore"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Target, TrendingUp, Wallet, Loader2, Coins } from "lucide-react"
-import { AddGoalModal } from "./add-goal-modal"
-import { AddContributionModal } from "./add-contribution-modal"
+import { Target, Wallet, Coins } from "lucide-react"
 import { GoalsList } from "./goals-list"
 import { ContributionHistory } from "./contribution-history"
 
-export function DashboardOverview() {
-  const { user } = useUser()
-  const firestore = useFirestore()
+interface DashboardOverviewProps {
+  goals: any[]
+  contributions: any[]
+}
+
+export function DashboardOverview({ goals, contributions }: DashboardOverviewProps) {
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
     setMounted(true)
   }, [])
 
-  const goalsQuery = useMemoFirebase(() => {
-    if (!firestore || !user?.uid) return null
-    return query(
-      collection(firestore, "users", user.uid, "goals"),
-      orderBy("createdAt", "desc")
-    )
-  }, [firestore, user?.uid])
-
-  const contributionsQuery = useMemoFirebase(() => {
-    if (!firestore || !user?.uid) return null
-    return query(
-      collection(firestore, "users", user.uid, "contributions"),
-      orderBy("date", "desc")
-    )
-  }, [firestore, user?.uid])
-
-  const { data: goals, isLoading: isGoalsLoading } = useCollection(goalsQuery)
-  const { data: contributions, isLoading: isContLoading } = useCollection(contributionsQuery)
-
   const totals = React.useMemo(() => {
-    if (!goals || !contributions) return { saved: 0, target: 0, active: 0 }
-    
     const initialSum = goals.reduce((acc, g) => acc + (Number(g.initialAmount) || 0), 0)
     const contributionSum = contributions.reduce((acc, c) => acc + (Number(c.amount) || 0), 0)
     const targetSum = goals.reduce((acc, g) => acc + (Number(g.targetAmount) || 0), 0)
@@ -57,23 +36,11 @@ export function DashboardOverview() {
     return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   }
 
-  if ((isGoalsLoading || isContLoading) && (!goals || !contributions)) {
-    return (
-      <div className="flex h-64 w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-6 animate-in fade-in duration-700 pb-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white font-headline">Minhas Metas</h2>
-        </div>
-        <div className="flex gap-2">
-          <AddContributionModal goals={goals || []} />
-          <AddGoalModal />
         </div>
       </div>
 
@@ -112,10 +79,10 @@ export function DashboardOverview() {
 
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
-          <GoalsList goals={goals || []} contributions={contributions || []} />
+          <GoalsList goals={goals} contributions={contributions} />
         </div>
         <div className="lg:col-span-1">
-          <ContributionHistory contributions={contributions || []} goals={goals || []} />
+          <ContributionHistory contributions={contributions} goals={goals} />
         </div>
       </div>
     </div>

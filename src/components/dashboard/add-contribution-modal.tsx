@@ -5,7 +5,7 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Coins, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -41,12 +41,22 @@ const formSchema = z.object({
   goalId: z.string().min(1, "Selecione uma meta"),
 })
 
-export function AddContributionModal({ goals }: { goals: any[] }) {
+interface AddContributionModalProps {
+  goals: any[]
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  showTrigger?: boolean
+}
+
+export function AddContributionModal({ goals, open, onOpenChange, showTrigger = true }: AddContributionModalProps) {
   const { user } = useUser()
   const firestore = useFirestore()
-  const [open, setOpen] = React.useState(false)
+  const [internalOpen, setInternalOpen] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const { toast } = useToast()
+
+  const isOpen = open !== undefined ? open : internalOpen
+  const setIsOpen = onOpenChange !== undefined ? onOpenChange : setInternalOpen
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -87,7 +97,7 @@ export function AddContributionModal({ goals }: { goals: any[] }) {
       date: serverTimestamp(),
       createdAt: serverTimestamp(),
     }).then(() => {
-      setOpen(false)
+      setIsOpen(false)
       form.reset()
       toast({ title: "Aporte registrado!", description: "Seu progresso foi atualizado." })
     }).finally(() => {
@@ -96,13 +106,14 @@ export function AddContributionModal({ goals }: { goals: any[] }) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="border-white/10 text-white hover:bg-white/5 flex gap-2">
-          <Coins className="h-4 w-4" />
-          Novo Aporte
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {showTrigger && (
+        <DialogTrigger asChild>
+          <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
+            Novo Aporte
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[400px] glass-morphism border-white/10 text-white">
         <DialogHeader>
           <DialogTitle className="text-xl font-headline font-bold">Adicionar Valor</DialogTitle>

@@ -3,9 +3,10 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { useUser, useAuth } from "@/firebase"
-import { Loader2, LogOut, Wallet, Plus, Home } from "lucide-react"
+import { useUser, useAuth, useFirestore, useCollection, useMemoFirebase } from "@/firebase"
+import { Loader2, LogOut, Wallet, Plus, Home, Target, Coins } from "lucide-react"
 import { signOut } from "firebase/auth"
+import { collection, query, orderBy } from "firebase/firestore"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,11 +17,36 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DashboardOverview } from "@/components/dashboard/overview"
+import { AddGoalModal } from "@/components/dashboard/add-goal-modal"
+import { AddContributionModal } from "@/components/dashboard/add-contribution-modal"
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser()
   const auth = useAuth()
+  const firestore = useFirestore()
   const router = useRouter()
+
+  const [isGoalModalOpen, setIsGoalModalOpen] = React.useState(false)
+  const [isContributionModalOpen, setIsContributionModalOpen] = React.useState(false)
+
+  const goalsQuery = useMemoFirebase(() => {
+    if (!firestore || !user?.uid) return null
+    return query(
+      collection(firestore, "users", user.uid, "goals"),
+      orderBy("createdAt", "desc")
+    )
+  }, [firestore, user?.uid])
+
+  const contributionsQuery = useMemoFirebase(() => {
+    if (!firestore || !user?.uid) return null
+    return query(
+      collection(firestore, "users", user.uid, "contributions"),
+      orderBy("date", "desc")
+    )
+  }, [firestore, user?.uid])
+
+  const { data: goals, isLoading: isGoalsLoading } = useCollection(goalsQuery)
+  const { data: contributions, isLoading: isContLoading } = useCollection(contributionsQuery)
 
   React.useEffect(() => {
     if (!isUserLoading && !user) {
@@ -37,7 +63,7 @@ export default function DashboardPage() {
     }
   }
 
-  if (isUserLoading || !user) {
+  if (isUserLoading || !user || isGoalsLoading || isContLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -95,10 +121,23 @@ export default function DashboardPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pb-32">
-        <DashboardOverview />
+        <DashboardOverview goals={goals || []} contributions={contributions || []} />
       </main>
 
-      {/* Fixed Bottom Header */}
+      {/* Modais Controlados */}
+      <AddGoalModal 
+        open={isGoalModalOpen} 
+        onOpenChange={setIsGoalModalOpen} 
+        showTrigger={false} 
+      />
+      <AddContributionModal 
+        goals={goals || []} 
+        open={isContributionModalOpen} 
+        onOpenChange={setIsContributionModalOpen} 
+        showTrigger={false} 
+      />
+
+      {/* Fixed Bottom Nav with Dropdown */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-xl border-t border-white/5 h-20 z-50 px-6 flex items-center justify-center shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)]">
         <div className="max-w-md w-full flex items-center justify-between">
           <button className="flex flex-col items-center gap-1 text-primary transition-all active:scale-90">
@@ -107,9 +146,25 @@ export default function DashboardPage() {
           </button>
           
           <div className="flex flex-col items-center justify-center -mt-12">
-            <div className="h-16 w-16 rounded-full bg-primary glow-primary flex items-center justify-center text-white border-4 border-background shadow-2xl active:scale-95 transition-all cursor-pointer">
-              <Plus className="h-8 w-8" />
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="h-16 w-16 rounded-full bg-primary glow-primary flex items-center justify-center text-white border-4 border-background shadow-2xl active:scale-95 transition-all cursor-pointer">
+                  <Plus className="h-8 w-8" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-48 mb-4 glass-morphism border-white/10 text-white">
+                <DropdownMenuLabel className="text-xs uppercase tracking-widest text-muted-foreground">O que deseja fazer?</DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem onClick={() => setIsGoalModalOpen(true)} className="flex items-center gap-2 cursor-pointer focus:bg-primary/20">
+                  <Target className="h-4 w-4 text-primary" />
+                  <span>Nova Meta</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIsContributionModalOpen(true)} className="flex items-center gap-2 cursor-pointer focus:bg-accent/20">
+                  <Coins className="h-4 w-4 text-accent" />
+                  <span>Novo Aporte</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <button 

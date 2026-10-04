@@ -4,7 +4,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useUser, useAuth } from "@/firebase"
-import { Loader2, LogOut, Wallet } from "lucide-react"
+import { Loader2, LogOut, Wallet, LayoutDashboard, Target, Home } from "lucide-react"
 import { signOut } from "firebase/auth"
 import {
   DropdownMenu,
@@ -46,7 +46,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-background overflow-x-hidden">
+    <div className="flex min-h-screen w-full flex-col bg-background overflow-x-hidden relative">
       <header className="flex h-16 shrink-0 items-center border-b border-white/5 px-4 md:px-8 sticky top-0 bg-background/80 backdrop-blur-md z-50">
         <div className="flex-1 flex items-center">
           <div className="flex items-center gap-2">
@@ -57,11 +57,8 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex-1 flex items-center justify-center">
-          <span className="text-base font-bold tracking-tighter text-white font-headline sm:block hidden">
+          <span className="text-base font-bold tracking-tighter text-white font-headline">
             Flux Finance
-          </span>
-          <span className="text-base font-bold tracking-tighter text-white font-headline sm:hidden block">
-            Flux
           </span>
         </div>
 
@@ -97,9 +94,34 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
+      <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pb-32">
         <DashboardOverview />
       </main>
+
+      {/* Fixed Bottom Header */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-xl border-t border-white/5 h-20 z-50 px-6 flex items-center justify-center shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)]">
+        <div className="max-w-md w-full flex items-center justify-between">
+          <button className="flex flex-col items-center gap-1 text-primary transition-all active:scale-90">
+            <Home className="h-6 w-6" />
+            <span className="text-[9px] font-bold uppercase tracking-tighter">Início</span>
+          </button>
+          
+          <div className="flex flex-col items-center justify-center -mt-10">
+            <div className="h-14 w-14 rounded-full bg-primary glow-primary flex items-center justify-center text-white border-4 border-background shadow-2xl active:scale-90 transition-all cursor-pointer">
+              <Target className="h-7 w-7" />
+            </div>
+            <span className="text-[9px] font-bold uppercase tracking-tighter mt-2 text-white">Minhas Metas</span>
+          </div>
+
+          <button 
+            onClick={handleLogout}
+            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-destructive transition-all active:scale-90"
+          >
+            <LogOut className="h-6 w-6" />
+            <span className="text-[9px] font-bold uppercase tracking-tighter">Sair</span>
+          </button>
+        </div>
+      </nav>
     </div>
   )
 }
